@@ -1,9 +1,11 @@
 # FileBrowser
 CS 320 Project Repository
+<pre>
+<b>tech-stack</b>
 
+  <b>tech</b>              <b>version</b>
 
-tech-stack        version
-
-React-Bootstrap 
-Django            2.1.1\n
-MongoDB           4.0.2
+  Python            3.7.0
+  Django            2.1.1
+  MongoDB           4.0.2
+</pre>
