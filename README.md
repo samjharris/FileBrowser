@@ -5,7 +5,7 @@ CS 320 Project Repository
 
   <b>tech</b>              <b>version</b>
 
-  Python            3.7.0
+  Python            3.5.1
   Django            2.1.1
   MongoDB           4.0.2
 </pre>
