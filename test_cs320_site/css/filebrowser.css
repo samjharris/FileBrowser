@@ -1,5 +1,5 @@
 body {
-  background-image: url("../bg.png") !important;
+  background-image: url("../assets/bg.png") !important;
 }
 
 .team_name {
@@ -63,16 +63,16 @@ body {
     text-align: center;
 }
 
-.pagination_footer {
-    margin: auto;
-}
-
-.pagination > li.active > a {
-  background: blue !important;
-}
-
 .disabled {
     opacity: 0.3 !important;
+}
+
+input, select, textarea {
+    color: #ffffff !important;
+}
+
+textarea:focus, input:focus {
+    color: #ffffff !important;
 }
 
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
