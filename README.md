@@ -19,7 +19,6 @@ CS 320 Project Repository
     <b>Database: (MongoDB-4.0.2)</b>
       <b>Name:</b> dump
       <b>Port:</b> 27017
-      
       <b>Username:</b> json_derulo
       <b>Password:</b> Br0ws3r!
 </pre>
