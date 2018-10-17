@@ -1,11 +1,23 @@
 # FileBrowser
 CS 320 Project Repository
+
+<b>Tech Stack</b> 
 <pre>
-<b>tech-stack</b>
-
-  <b>tech</b>              <b>version</b>
-
+                    <b>version</b>
+  Vue.js            ?
   Python            3.5.1
-  Django            2.1.1
+  Flask             ?
   MongoDB           4.0.2
+</pre>  
+  
+<b>AWS Info</b>
+<pre>
+  <b>IP:</b> aws.kylesilverman.com
+  <b>Username:</b> json_derulo
+  <b>Password:</b> Br0ws3r!
+  
+  <b>Services:</b>
+    <b>Database:</b>
+      <b>Name:</b> dump
+      <b>Port:</b> 27017
 </pre>
