@@ -13,11 +13,13 @@ CS 320 Project Repository
 <b>AWS Info</b>
 <pre>
   <b>IP:</b> aws.kylesilverman.com
-  <b>Username:</b> json_derulo
-  <b>Password:</b> Br0ws3r!
+  
   
   <b>Services:</b>
     <b>Database: (MongoDB-4.0.2)</b>
       <b>Name:</b> dump
       <b>Port:</b> 27017
+      
+      <b>Username:</b> json_derulo
+      <b>Password:</b> Br0ws3r!
 </pre>
