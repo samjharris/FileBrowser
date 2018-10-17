@@ -17,8 +17,7 @@ CS 320 Project Repository
   <b>Password:</b> Br0ws3r!
   
   <b>Services:</b>
-    <b>Database:</b>
-      <b>Dist:</b> MongoDB-4.0.2
+    <b>Database: (MongoDB-4.0.2)</b>
       <b>Name:</b> dump
       <b>Port:</b> 27017
 </pre>
