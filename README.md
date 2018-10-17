@@ -18,6 +18,7 @@ CS 320 Project Repository
   
   <b>Services:</b>
     <b>Database:</b>
+      <b>Dist:</b> MongoDB-4.0.2
       <b>Name:</b> dump
       <b>Port:</b> 27017
 </pre>
