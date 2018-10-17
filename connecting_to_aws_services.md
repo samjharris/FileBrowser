@@ -17,7 +17,7 @@ This is a tutorial on how to use all our services running on AWS.
 
 ## MongoDB
 
-**NOTE:** Make sure you have Mongo installed on your system with all the necessary dependencies. See [backend_setup.md](https://github.com/samjharris/FileBrowser/blob/master/backend_setup.md).
+**NOTE:** Make sure you have Mongo installed on your system with all the necessary dependencies. See [backend_setup.md](https://github.com/samjharris/FileBrowser/blob/master/backend_setup.md#mongodb-setup).
 
 ### Server Information
 * IP: aws.kylesilverman.com
@@ -27,7 +27,7 @@ This is a tutorial on how to use all our services running on AWS.
 * Port: 27017
 
 ### Connect via CLI
-* Use the following notion from your local machine with the information above: `mongo -u <user> -p <password> <ip>/<database>`
+* Use the following notation from your local machine with the information above: `mongo -u <user> -p <password> <ip>/<database>`
 
 ### Connect via PyMongo
 * Import the PyMongo module: `import pymongo`
