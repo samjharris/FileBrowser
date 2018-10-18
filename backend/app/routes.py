@@ -1,6 +1,7 @@
 from app import app
 from flask import request
 from flask_pymongo import PyMongo
+from flask import jsonify
 
 #low level connector to mongoDB
 mongo = PyMongo(app)
@@ -9,7 +10,8 @@ print([c for c in mongo.db.items.find({})])
 
 @app.route('/')
 def index():
-    return "Okay"
+    machines = [c for c in mongo.db.items.find({})]
+    return jsonify(machines[0])
 
 @app.route('/message', methods=['POST'])
 def hello():
