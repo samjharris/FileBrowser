@@ -1,11 +1,11 @@
 from app import app
 from flask import request
-
-
 from flask_pymongo import PyMongo
 
-app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
+#low level connector to mongoDB
 mongo = PyMongo(app)
+print([c for c in mongo.db.items.find({})])
+
 
 @app.route('/')
 def index():
