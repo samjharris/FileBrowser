@@ -1,0 +1,166 @@
+
+//Data Schema & validators for MongoDB Collections
+
+
+
+//Begin tenant collection creation 
+
+db.createCollection(<tenantID>, {
+							     capped: false,
+                                 autoIndexId: true,
+                                 validator: <document>,
+                                 validationLevel: "strict",
+                                 validationAction: "error"
+                                })
+
+
+//Two different data validation schema for one collection?
+//Use schema for data document with "warn" validaiton action and inspect errors.
+
+
+//Begin machine document schema
+db.createCollection("<tenantID>", {
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["serialNumberInserv","tenants"],
+			properties: {
+				"serialNumberInserv": {
+					bsonType: "string",
+					description: "Invalid serial number, this is a required field!"
+				},
+				"tenants": {
+					bsonType: "array",
+					description: "Invalid tenant list, this is a required field!"
+				},
+				"system": {
+					bsonType: "object",
+					properties: {
+						"companyName": {
+							bsonType: "string"
+						},
+						"fullModel": {
+							bsonType: "string"
+						},					
+					}
+				}
+			}
+		}
+	}
+	validationAction: "error"
+})
+
+
+
+//Begin data document schema
+
+	validator: {
+		$jsonSchema: {
+			bsonType: "object",
+			required: ["serialNumberInserv","date"],
+			properties: {
+				"serialNumberInserv": {
+					bsonType: "string",
+					description: "Machine serial number, this is a required field!"
+				},
+				"system": {
+					bsonType: "object",
+					properties: {
+						"companyName": {
+							bsonType: "string"
+						},
+						"model": {
+							bsonType: "string"
+						},
+						"fullModel": {
+							bsonType: "string"
+						},
+						"osVersion": {
+							bsonType: "string"
+						},
+						"patches": {
+							bsonType: "array"
+						},	
+						"sp": {
+							bsonType: "object",
+							properties: {
+								"spId": {
+									bsonType: "string"
+								},
+								"spModel": {
+								    bsonType: "string"
+								},
+								"spVersion": {
+									bsonType: "string"
+								},
+								"spPatches": {
+									bsonType: "array"
+								}
+							}
+						},
+						"productSKU": {
+							bsonType: "string"
+						},
+						"productFamily" {
+							bsonType: "string"
+						},
+						"recommended": {
+							bsonType: "object",
+							properties: {
+								"critialPatches": {
+									bsonType: "array"
+								},
+								"conditionalPatches": {
+									bsonType: "array"
+								}
+							}
+						},
+						"portsHWInfo": {
+							bsonType: "array" //ARRAY OF OBJECTS
+						}
+					}
+				}
+				"capacity": {
+					bsonType: "object",
+					properties: {
+						//TODO
+					}
+				},
+				"performance": {
+					bsonType: "object",
+					properties: {
+						//TODO
+					}
+				},
+				"disks": {
+					bsonType: "object",
+					properties: {
+						//TODO
+					}
+				},
+				"nodes": {
+					bsonType: "object",
+					properties: {
+						//TODO
+					}
+				},
+				"updated": {
+					bsonType: "object",
+					properties: {
+						//TODO
+					}
+					bsonType: "string"
+				},
+				"authorized": {
+					bsonType: "object",
+					properties: {
+						//TODO
+					}
+				},
+				"date": {
+					bsonType: "string"
+				}
+			}
+		}
+	}
+	validationAction: "error"
