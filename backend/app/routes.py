@@ -11,7 +11,7 @@ print([c for c in mongo.db.items.find({})])
 @app.route('/')
 def index():
     machines = [c for c in mongo.db.items.find({})]
-    return jsonify(machines[0])
+    return jsonify(machines)
 
 @app.route('/message', methods=['POST'])
 def hello():
