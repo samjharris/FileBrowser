@@ -75,7 +75,7 @@ def logout():
 def login():
 
     
-    # extract the args from the quert string
+    # extract the args from the query string
     
     tenant = request.args.get("tenant")
 
