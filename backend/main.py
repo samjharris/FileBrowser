@@ -91,7 +91,7 @@ def login():
 
         # get the pswd field
 
-        conf = user.password
+        conf = user["password"]
 
 
         if sha256_crypt.verify(pswd, conf):
