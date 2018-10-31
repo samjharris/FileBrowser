@@ -7,6 +7,7 @@ import json
 from collections import namedtuple
 import datetime
 from driver_defs import *
+import time
 
 # --- List of script parameters --- #
 # Where is the zip file of the dump located?
@@ -47,19 +48,34 @@ client = pymongo.MongoClient(MONGO_URI)
 
 # grab the DB object that contains all the data for our project
 db = client[MONGO_DB]
+if not db:
+    priint(" ERROR: database is of type None")
 
 worker = JsonWorker(db, json_files)
 worker.make_dicts()
-print(worker.dicts[0])
-exit()
+print(("\n\033[94m\033[1m BEGINNING DB MIGRATIONS \033[0m\n\n"))
 
-for log in worker.dicts:
+
+for i, log in enumerate(worker.dicts):
     # creates a machine document that describes the machine which produced this log
     machine = worker.create_machine_doc(log)
     # updates the database to isnert this machine docuemnet if it does not exist, update otherwise
     machine.update_db()
     # insert this log into the database.  Arguments to the insert_docs() method is an array to support inserting multiple docs
     inserted_ids = worker.insert_docs([log])
+    if i % 50 == 0:
+        print(
+            (
+                "\n"
+                + "\033[94m"
+                + "\033[1m"
+                + " STATUS: %i log documents have been inserted to the database ..."
+                + "\033[0m"
+                + "\n"
+            )
+            % i
+        )
+        time.sleep(1)
     # tells the machine document that was created earlier representing the machine that produced tihs log
     # to update all isntances of the machine doc in the database to contain this log's <ObjectID>
     machine.update_log_links(inserted_ids)
