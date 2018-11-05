@@ -5,6 +5,8 @@ This file defines several classes and methods which support the MongoDB driver f
 import pymongo
 import json
 import re
+import datetime
+import time
 
 """
 This class is meant for representing the important fields that would make up a "machine document"
@@ -13,6 +15,16 @@ exists in, its model, its serialNum, the tennants it belongs to, etc.
 This class will take care of interfacing with a machine in the database with these certain properties you define
 about this machine.
 """
+
+# colors for command line output of database migrations
+HEADER = "\033[95m"
+OKBLUE = "\033[94m"
+OKGREEN = "\033[92m"
+WARNING = "\033[93m"
+FAIL = "\033[91m"
+ENDC = "\033[0m"
+BOLD = "\033[1m"
+UNDERLINE = "\033[4m"
 
 
 class MachineDoc:
@@ -36,53 +48,52 @@ class MachineDoc:
             "model": self.model,
             "tenants": self.tenants,
             "last_update": self.last_update,
+            "logs": self.logs,
         }
 
     def update_db(self, validator=None):
         """
-        Updates this machine document into the db specified.  Collections are retrieved
-        via the tenants list, which has a default value of HPE for all machines.
+        Updates this machine document into the machine doc collection.
         If there already is a machine document in the database (searched for by ssn), then that document will be
         updated to the new values. If the document does not exist, then a new one is created and the logs array
         is updated to the most recent log.
-
         Args:
             validator: a PyMongo validator which will ensure the new collection that is created will only accept machine documents of the correct type
         """
-        # this document must be inserted for each of the tenants it belongs to
-        for tenant in self.tenants:
-            coll = self.db[tenant]
-            # update
-            doc = coll.find_one({"ssn": self.ssn})
-            if doc:
-                print(" exisitng machine document found, updating...")
-                # append this machine document's tenants array to the existing tenants array that
-                # alreadys exists within this document as well as the last time it was updated
-                #
-                coll.find_one_and_update(
-                    {"ssn": self.ssn},
-                    {"$set": {"tenants": list(set(doc["tenants"]).add(set(self.tenants)))}},
-                    {"$set": {"last-update": self.last_update}},
-                )
-                print(" machine document sucesfully updated:", self.data)
+        coll = self.db["machines"]
+        # update
+        doc = coll.find_one({"ssn": self.ssn})
+        if doc:
+            print((WARNING + " exisitng machine document found, updating..." + ENDC))
+            # append this machine document's tenants array to the existing tenants array that
+            # alreadys exists within this document as well as the last time it was updated
+            #
+            coll.find_one_and_update(
+                {"ssn": self.ssn},
+                {
+                    "$set": {
+                        "tenants": doc["tenants"] + list(set(self.tenants) - set(doc["tenants"])),
+                        "last-update": self.last_update,
+                    }
+                },
+            )
+            print((OKGREEN + " machine document sucesfully updated: ssn = %s" + ENDC) % self.ssn)
+        else:
+            # if a validator is supplied, then:
+            # [TODO] create the collection with the specified validation rules
+            # else insert the document anyways without a validator
+            if validator:
+                print((WARNING + " WARNING: validator not yet implemented" + ENDC))
+                coll.insert_one(self.data)
+                print((OKGREEN + " new machine document inserted: ssn = %s" + ENDC) % self.ssn)
             else:
-                # if a validator is supplied, then:
-                # [TODO] create the collection with the specified validation rules
-                # else insert the document anyways without a validator
-
-                if validator:
-                    print(" WARNING: validator not yet implemented")
-                    coll.insert_one(self.data)
-                    print(" new machine document inserted:", self.data)
-                else:
-                    coll.insert_one(self.data)
-                    print(" new machine document inserted:", self.data)
+                coll.insert_one(self.data)
+                print((OKGREEN + " new machine document inserted: ssn = %s" + ENDC) % self.ssn)
 
     def update_log_links(self, docs=None, strays=False):
         """
         Updates this machine document into the db specified.  If the machine document cannot be found, the
         function returnsself.
-        ollections where logs for this machine could live are retrieved via the tenants list of this object.
         Setting strays to True will cause the update function to search the database for all matching log
         documents with the serialNumberInserv and fetch their <ObjectID>s if those <ObjectID>s cannot be
         found in each machine document's log array, then that machine document's log array is updated.
@@ -94,18 +105,35 @@ class MachineDoc:
             docs: an array of <ObjectID>s already existing in the database of log documents needing to be linked
                     to the logs array of each machine document represented by this object MachineDoc
         """
-        for tenant in self.tenants:
-            coll = self.db[tenant]
-            # get the _id of one existing log for this machine
-            doc = coll.find_one({"ssn": self.ssn})
-            # if not machine is found then return
-            if not doc:
-                return
-            gen = doc["logs"][0]
-            if not gen:
-                print(" no logs for this machine")
+        coll = self.db["machines"]
+        # get the _id of one existing log for this machine
+        doc = coll.find_one({"ssn": self.ssn})
+        # if not machine is found then return
+        if not doc:
+            return
+        if "logs" not in doc.keys():
+            print(
+                (FAIL + " ERROR: cannot find logs[] array for machine with ssn: %s" + ENDC)
+                % self.ssn
+            )
+            exit()
+        gen = doc["logs"]
+        if len(gen) < 1:
+            print((WARNING + " WARNING: no logs for this machine" + ENDC))
+            gen = None
+        else:
+            gen = gen[0]
 
-            if strays:
+        if strays:
+            if not gen:
+                print(
+                    (
+                        FAIL
+                        + " ERROR: cannot link stray documents witout a document already linked to this machine for finding the serial number"
+                        + ENDC
+                    )
+                )
+            else:
                 # find all documents in this collection that have a serialNum the same as this machine
                 cur = coll.find({"serialNumberInserv": gen["serialNumberInserv"]})
                 for res in cur:
@@ -114,19 +142,29 @@ class MachineDoc:
                     if res_id not in doc["logs"]:
                         coll.find_one_and_update(
                             {"ssn": self.ssn},
-                            {"$set": {"logs": list(set(doc["logs"]).add(set(res_id)))}},
-                            {"$set": {"last-update": self.last_update}},
+                            {
+                                "$set": {
+                                    "logs": doc["logs"] + list(set([res_id]) - set(doc["logs"])),
+                                    "last-update": self.last_update,
+                                }
+                            },
                         )
-                        print(" added log %s to this machine's logs" % (str(res_id)))
-
-            if docs:
-                for log_id in docs:
-                    coll.find_one_and_update(
-                        {"ssn": self.ssn},
-                        {"$set": {"logs": list(set(doc["logs"]).add(set(log_id)))}},
-                        {"$set": {"last-update": self.last_update}},
-                    )
-                    print(" added log %s to this machine's logs" % (str(log_id)))
+                        print(
+                            (OKGREEN + " added log %s to this machine's logs" + ENDC)
+                            % (str(res_id))
+                        )
+        if docs:
+            for log_id in docs:
+                coll.find_one_and_update(
+                    {"ssn": self.ssn},
+                    {
+                        "$set": {
+                            "logs": doc["logs"] + list(set([log_id]) - set(doc["logs"])),
+                            "last-update": self.last_update,
+                        }
+                    },
+                )
+                print((OKGREEN + " added log %s to this machine's logs" + ENDC) % (str(log_id)))
 
     def exists(self):
         """
@@ -136,13 +174,12 @@ class MachineDoc:
         Returns:
             A boolean representing if this machine was found to exist in any tenant's collection
         """
-        for tenant in self.tenants:
-            coll = self.db[tenant]
-            # get the _id of one existing log for this machine
-            doc = coll.find_one({"ssn": self.ssn})
-            # if not machine is found then return
-            if doc:
-                return True
+        coll = self.db["machines"]
+        # get the _id of one existing log for this machine
+        doc = coll.find_one({"ssn": self.ssn})
+        # if not machine is found then return
+        if doc:
+            return True
         # no documents were found, return False
         return False
 
@@ -176,7 +213,7 @@ class JsonWorker:
         if json_files_names[0].endswith(".json"):
             self.json_files = json_files_names
         else:
-            print("error, JsonWorker created with non-JSON files")
+            print((FAIL + " ERROR: JsonWorker created with non-JSON files" + ENDC))
             self.json_files = []
 
     def make_dicts(self):
@@ -197,10 +234,38 @@ class JsonWorker:
             f = open(file)
             self.dicts.append(json.load(f))
             n_dicts = i
-        print(" created %i new dictionaries in self.dicts" % n_dicts)
+        print((OKBLUE + " created %i new dictionaries in self.dicts" + ENDC) % n_dicts)
         return self.dicts
 
-    def insert_docs(self, dicts=None):
+    def exist_doc(self, dic, duplicates):
+        """
+        Checks whether a document exists in the DB and prints an error message if so, and returns true of false
+        """
+        coll = self.db["logs"]
+        res = coll.find_one({"serialNumberInserv": dic["serialNumberInserv"], "date": dic["date"]})
+        if res:
+            print(
+                (
+                    FAIL
+                    + "   WARNING: existing identical log document found in dump directory!  Please make sure this is a new set of log documents"
+                )
+            )
+            print(
+                (
+                    "   no new documents were or will be inserted because"
+                    + ENDC
+                    + " 'duplicates' "
+                    + WARNING
+                    + "is set to %s"
+                    + ENDC
+                )
+                % duplicates
+            )
+            return True
+        else:
+            return False
+
+    def insert_docs(self, dicts=None, duplicates=False):
         """
         Inserts all the document in this object's dicts array into the database that was
         specified during the instantiation of this object.  Every time a document is sucesfully
@@ -210,43 +275,52 @@ class JsonWorker:
 
         Args:
             dicts: a list of Python dictionaries representing additional dicitonaries of JSON data that should be inserted
+            duplicates: whether to add duplicate documents to the database, default is false since we only want one log per dump datas
 
         Returns:
-            The array of <ObjectID>s of sucesfully inserted documents to the database
+            The array of <ObjectID>s of sucesfully inserted documents to the database, or None if nothing was inserted
         """
         inserted = []
         if dicts:
-            for dict in dicts:
-                tenants = dict["authorized"]["tenants"]
-                for tenant in tenants:
-                    coll = self.db[tenant]
-                    _id = coll.insert_one(dict)
-                    # exit loop if error
-                    if not _id.acknowledged:
-                        print(" error inserting document:", dict)
-                        break
-                    # add this document's <ObjectID> to the list of inserted <ObjectID>s
-                    _id = _id.inserted_id
-                    self.inserted_docs.append(_id)
-                    inserted.append(_id)
-            return inserted
-
-        for dict in self.dicts:
-            # the list of tenants lives in the [object].authorized.tenants array
-            tenants = dict["authorized"]["tenants"]
-            # get the collection from the database for each tenant retrieved from the JSON, and isnert
-            for tenant in tenants:
-                coll = self.db[tenant]
-                _id = coll.insert_one(dict)
+            for dic in dicts:
+                if self.exist_doc(dic, duplicates):
+                    continue
+                coll = self.db["logs"]
+                _id = coll.insert_one(dic)
                 # exit loop if error
                 if not _id.acknowledged:
-                    print(" error inserting document:", dict)
+                    print(
+                        (FAIL + " ERROR: inserting document with ssn: %s" + ENDC)
+                        % dic["serialNumberInserv"]
+                    )
                     break
                 # add this document's <ObjectID> to the list of inserted <ObjectID>s
                 _id = _id.inserted_id
                 self.inserted_docs.append(_id)
                 inserted.append(_id)
-        return inserted
+            return inserted
+
+        for dic in self.dicts:
+            if self.exist_doc(dic, duplicates):
+                continue
+            # get the collection from the database for each tenant retrieved from the JSON, and isnert
+            coll = self.db["logs"]
+            _id = coll.insert_one(dic)
+            # exit loop if error
+            if not _id.acknowledged:
+                print(
+                    (FAIL + " ERROR: inserting document with ssn: %s" + ENDC)
+                    % dic["serialNumberInserv"]
+                )
+                break
+            # add this document's <ObjectID> to the list of inserted <ObjectID>s
+            _id = _id.inserted_id
+            self.inserted_docs.append(_id)
+            inserted.append(_id)
+        if len(self.dicts) > 0:
+            return inserted
+        else:
+            return None
 
     def create_machine_doc(self, log_dict):
         """
@@ -261,7 +335,13 @@ class JsonWorker:
             a MachineDoc object if creation was sucesfull, None otherwise
         """
         if not log_dict:
-            print(" ERROR: cannot create a machine document from an empty dictionary")
+            print(
+                (
+                    FAIL
+                    + " ERROR: cannot create a machine document from an empty dictionary, skipping this machine document creation"
+                    + ENDC
+                )
+            )
             return None
         ssn = log_dict["serialNumberInserv"]
         model = log_dict["system"]["model"]
