@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <Assets/>
-    <Login place="America"/>
   </div>
 </template>
 
