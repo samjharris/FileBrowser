@@ -1,13 +1,14 @@
 <template>
-	<h1>{{ place }}</h1>
+	<h1>this is a test</h1>
 	
 </template>
 
 <script>
 export default {
-  name: 'Login',
+  name: 'Login'
+  /*
   props: {
     place: String
-  }
+  }*/
 }
 </script>
