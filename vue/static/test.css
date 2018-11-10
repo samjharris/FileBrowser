@@ -1,0 +1,51 @@
+#app {
+  height: 100% !important;
+}
+
+.modal {
+    padding: 0 !important;
+}
+.modal-dialog {
+    max-width: 100%;
+    height: 100%;
+    margin: 0;
+}
+.modal-content {
+    border: 0;
+    border-radius: 0;
+    min-height: 100%;
+    height: auto;
+}
+
+.container-fluid {
+	min-height: 100% !important;
+	height: 100% !important;
+	/*border: 1px solid blue;*/
+}
+
+.border {
+	border: 3px solid green !important;
+}
+
+.inner {
+	border: 1px solid red !important;
+}
+
+.abs {
+	position: static !important;
+	display: block !important;
+}
+
+.i {
+	padding: 0px !important;
+	margin: 0px !important;
+}
+
+.siz {
+    min-width: 225px !important;
+    max-width: 400px !important;
+}
+
+.outline {
+    border: 1px solid blue;
+}
