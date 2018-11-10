@@ -6,7 +6,7 @@ CS 320 Project Repository
                     <b>version</b>
   Vue.js            ?
   Python            3.5.1
-  Flask             ?
+  Flask             1.0.2
   MongoDB           4.0.2
 </pre>  
   

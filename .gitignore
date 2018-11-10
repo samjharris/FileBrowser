@@ -1,4 +1,4 @@
-studyhub.py
 *.json
-*.gz
 *.tar
+*.gz
+*.pyc
