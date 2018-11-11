@@ -26,6 +26,10 @@
 	/*border: 1px solid blue;*/
 }
 
+.down {
+    margin-top: 200px !important;
+}
+
 .asset {
 	border: 3px solid green !important;
 }

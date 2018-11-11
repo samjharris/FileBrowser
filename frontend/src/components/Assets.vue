@@ -106,9 +106,14 @@
 <script>
 export default {
   name: 'Assets',
-  /*props: {
-    data: Array
-  }*/
+  created: function() {
+  	const path = `https://cors-anywhere.herokuapp.com/http://aws.kylesilverman.com/machines`
+    this.$http.post(path).then(response => {
+      	console.log(response)
+    }).catch(error => {
+      	console.log(error)
+    })
+  },
   data() {
   	return {
 	  	items: [
