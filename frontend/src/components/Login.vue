@@ -33,7 +33,7 @@ export default {
     onSubmit (evt) {
       evt.preventDefault();
       
-      const path = 'https://cors-anywhere.herokuapp.com/http://aws.kylesilverman.com/login?'
+      const path = 'http://aws.kylesilverman.com/login?'
       const data = "tenant="+this.form.username+"&password="+this.form.password
       this.$http.post(path+data).then(response => {
       	this.$session.start()

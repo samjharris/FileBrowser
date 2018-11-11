@@ -198,7 +198,12 @@ export default {
   		this.$router.push('/')
   	}
   	else {
-  		console.log(this.$session.getAll())
+  		const path = 'http://aws.kylesilverman.com/machines'
+  		this.$http.post(path).then(response => {
+  			console.log(response.text)
+  		}).catch(error => {
+  			console.log(this.$session.getAll())
+  		})
   	}
   },
   methods: {
