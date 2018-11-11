@@ -198,7 +198,7 @@ export default {
   		this.$router.push('/')
   	}
   	else {
-  		const path = 'http://aws.kylesilverman.com/machines'
+  		const path = 'http://aws.kylesilverman.com:5000/machines'
   		this.$http.post(path).then(response => {
   			console.log(response.text)
   		}).catch(error => {
