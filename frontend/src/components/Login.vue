@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
 	
 	<b-container>
 		<b-row class="down">
@@ -17,11 +18,15 @@
 			</b-col>
 		</b-row>
 	</b-container>
+=======
+	<h1>this is a test</h1>
+>>>>>>> 500cdad8f7cc9c8d850dcfc7a4e8f1a4283b7fc2
 	
 </template>
 
 <script>
 export default {
+<<<<<<< HEAD
   name: 'Login',
   data () {
     return {
@@ -45,6 +50,9 @@ export default {
     })
     }
   }
+=======
+  name: 'Login'
+>>>>>>> 500cdad8f7cc9c8d850dcfc7a4e8f1a4283b7fc2
   /*
   props: {
     place: String

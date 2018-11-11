@@ -21,9 +21,14 @@ export default new Router({
     },
     {
       path: '*',
+<<<<<<< HEAD
       redirect: "/"
       //name:'Error404',
       //component: error404
+=======
+      name:'Error404',
+      component: error404
+>>>>>>> 500cdad8f7cc9c8d850dcfc7a4e8f1a4283b7fc2
     }
   ]
 })
