@@ -21,8 +21,7 @@ export default new Router({
     },
     {
       path: '*',
-      name:'Error404',
-      component: error404
+      redirect: "/"
     }
   ]
 })
