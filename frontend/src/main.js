@@ -18,6 +18,17 @@ Vue.use(BootstrapVue);
 Vue.use(VueResource);
 Vue.use(VueSession);
 
+Vue.http.options.xhr = {withCredentials: true}
+Vue.http.options.crossOrigin = true
+
+
+Vue.http.headers.common['Content-Type'] = 'application/json';
+Vue.http.headers.common['Accept'] = 'application/json';
+Vue.http.headers.common['credentials'] = 'same-origin';
+Vue.http.headers.common['Authorization'] = 'JsOnDeRulO';
+Vue.http.headers.common['Access-Control-Allow-Origin'] = '*'
+Vue.http.headers.common['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, Authorization, Access-Control-Allow-Origin'
+
 new Vue({
   router,
   render: h => h(App)

@@ -17,6 +17,7 @@ from flask_cors import CORS
 ################################################################################
 
 app = Flask(__name__)
+#cors = CORS(app, resources={r"/*": {"origins": "*"}})
 CORS(app)
 
 app.secret_key = "JsOnDeRulO"
@@ -86,29 +87,9 @@ def login():
 
     pswd = request.args.get("password")
 
+    if(authenticate_user(tenant, pswd)):
 
-    # search for the user according to the query args
-    
-    user = mongo.db.users.find_one({"tenant": tenant})
-
-
-    if user is not None:
-
-        # get the pswd field
-
-        conf = user["password"]
-
-
-        if sha256_crypt.verify(pswd, conf):
-
-            # storing the session info
-            
-            session["tenant"] = tenant 
-
-            # return successful
-
-            return STATUS_200
-
+        return STATUS_200
 
     # unauthorized user
     
@@ -123,13 +104,17 @@ def login():
 
 def machines():
 
-    if "tenant" in session:
+    tenant = request.args.get("tenant")
+
+    pswd = request.args.get("password")
+
+    if(authenticate_user(tenant, pswd)):
 
         machines = mongo.db.machines.find({
 
             # get machines with the tenant
             
-            "tenants": session["tenant"]
+            "tenants": tenant #session["tenant"]
 
         })
 
@@ -194,3 +179,27 @@ if __name__ == "__name__":
 ################################################################################
 ################################################################################
 ################################################################################
+
+def authenticate_user(tenant, pswd):
+
+    # search for the user according to the query args
+    
+    user = mongo.db.users.find_one({"tenant": tenant})
+
+
+    if user is not None:
+
+        # get the pswd field
+
+        conf = user["password"]
+
+
+        if sha256_crypt.verify(pswd, conf):
+
+            # return successful
+
+            return True
+
+    # unauthorized user
+    
+    return False
