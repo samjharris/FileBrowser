@@ -33,12 +33,15 @@ export default {
     onSubmit (evt) {
       evt.preventDefault();
       
-      const path = 'http://aws.kylesilverman.com:5000/login?'
+      const path = 'http://localhost:5000/login?'
       const data = "tenant="+this.form.username+"&password="+this.form.password
       this.$http.post(path+data).then(response => {
-      	this.$session.start()
-      	this.$session.set('tenant', this.form.username)
-      	this.$router.push('/assets')
+      this.$session.start()
+      this.$session.set('tenant', this.form.username)
+      this.$session.set('password', this.form.password)
+      this.$router.push({
+          name: 'Assets',
+        })
       }).catch(error => {
       	console.log("username: "+this.form.username+" password: "+this.form.password)
       	console.log(error)

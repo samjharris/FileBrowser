@@ -20,6 +20,10 @@
     transform: translate(0%, 50%);
 }
 
+.down {
+    margin-top: 200px;
+}
+
 .container-fluid {
 	min-height: 100% !important;
 	height: 100% !important;
@@ -54,5 +58,9 @@
 }
 
 .col {
-    border: 1px solid red;
+    border: 1px solid white;
+}
+
+.hover_mouse {
+    cursor: pointer;
 }
