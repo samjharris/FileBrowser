@@ -2,6 +2,11 @@
 <div>
 	<b-navbar variant="dark" type="dark">
 		<b-navbar-brand tag="h1" class="mb-0">JSON Derulo</b-navbar-brand>
+		<b-navbar-brand tag="h3" class="mb-0"> 
+			<b-form @submit="onLogout">
+				<b-button type="submit">Logout</b-button>
+			</b-form>
+		</b-navbar-brand>
 	</b-navbar>
 
 	<b-container fluid class="h-100">
@@ -106,9 +111,6 @@
 <script>
 export default {
   name: 'Assets',
-  /*props: {
-    data: Array
-  }*/
   data() {
   	return {
 	  	items: [
@@ -190,7 +192,26 @@ export default {
 	      { serial: '83027', tenants: ['Dan', 'hpe'], last_updated: '18/04/13 05:27:55' }
 	    ]
 	}
-  }
+  },
+  beforeCreate: function() {
+  	if (!this.$session.exists()) {
+  		this.$router.push('/')
+  	}
+  	else {
+  		const path = 'http://aws.kylesilverman.com:5000/machines'
+  		this.$http.post(path).then(response => {
+  			console.log(response.text)
+  		}).catch(error => {
+  			console.log(this.$session.getAll())
+  		})
+  	}
+  },
+  methods: {
+  	onLogout () {
+  		this.$session.destroy()
+  		this.$router.push('/')
+  	}
+  } 
 }
 </script>
 

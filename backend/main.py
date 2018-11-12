@@ -10,11 +10,14 @@ from passlib.hash import sha256_crypt
 
 from bson.json_util import loads, dumps
 
+from flask_cors import CORS
+
 ################################################################################
 # App Setup ####################################################################
 ################################################################################
 
 app = Flask(__name__)
+CORS(app)
 
 app.secret_key = "JsOnDeRulO"
 
