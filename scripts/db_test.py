@@ -24,9 +24,9 @@ test_database_logs_count = True
 test_database_logs_exists_exhaustive = True
 
 #Declare useful options:
-flag_v = False #VERBOSE MODE
+flag_v = True #VERBOSE MODE
 MONGO_URI = "aws.kylesilverman.com" #MongoDB host
-MONGO_DB = "dump" #MongoDB db name
+MONGO_DB = "data" #MongoDB db name
 MONGO_USER = "json_derulo" #MongoDB username
 MONGO_PASSWORD = "Br0ws3r!" #MongoDB password
 
@@ -88,7 +88,7 @@ if test_database_machines_count:
 	db_collectionNames = db.list_collection_names()
 	
 	for filename in os.listdir(DATA_ITEM):
-		if re.search(r"/\._.*\.json$", filename):
+		if filename.startswith('._'):		
 			continue
 		name = filename.split('-')[0]
 		if name in proper_machines:
@@ -101,6 +101,7 @@ if test_database_machines_count:
 		db_numMachines = db_machines.count_documents({})
 		if proper_numMachines == db_numMachines:
 			print("PASS: test_database_machines_count")
+			tests_passed+=1
 		else:
 			print("FAIL: test_database_machines_count")
 			print("\t- Expected: " + str(proper_numMachines) + " actual: " + str(db_numMachines))
@@ -120,7 +121,7 @@ if test_database_machines_names_duplicates:
 	num_mis = 0
 	db_collectionNames = db.list_collection_names()
 	for filename in os.listdir(DATA_ITEM):
-		if re.search(r"/\._.*\.json$", filename):
+		if filename.startswith('._'):
 			continue
 		name = filename.split('-')[0]
 		if name in proper_machines_dict:
@@ -144,6 +145,7 @@ if test_database_machines_names_duplicates:
 				num_mis += 1
 		if len(msg_dup) == 0 and len(msg_mis) == 0:
 			print("PASS: test_database_machines_names_duplicates")
+			tests_passed+=1
 		else:
 			print("FAIL: test_database_machines_names_duplicates")
 			if len(msg_dup) > 0:
@@ -169,7 +171,7 @@ if test_database_logs_count:
 	db_numLogs = 0
 	db_collectionNames = db.list_collection_names()
 	for filename in os.listdir(DATA_ITEM):
-		if re.search(r"/\._.*\.json$", filename):
+		if filename.startswith('._'):
 			continue
 		proper_numLogs+=1	
 	if "logs" in db_collectionNames:
@@ -177,6 +179,7 @@ if test_database_logs_count:
 		db_numLogs = db_logs.count_documents({})
 		if proper_numLogs == db_numLogs:
 			print("PASS: test_database_logs_count")
+			tests_passed+=1
 		else:
 			print("FAIL: test_database_logs_count")
 			print("\t- Expected: " + str(proper_numLogs) + " actual: " + str(db_numLogs))
@@ -193,7 +196,7 @@ if test_database_logs_exists_exhaustive:
 	db_collectionNames = db.list_collection_names()
 
 	for filename in os.listdir(DATA_ITEM):	
-			if re.search(r"/\._.*\.json$", filename):
+			if filename.startswith('._'):
 				continue
 			name = filename.split('-')[0]
 			if name in proper_machines_dict:
@@ -213,6 +216,7 @@ if test_database_logs_exists_exhaustive:
 
 		if len(msg) == 0:
 			print("PASS: test_database_logs_exists_exhaustive")
+			tests_passed+=1
 		else:
 			print("FAIL: test_database_logs_exists_exhaustive")
 			if(flag_v):
@@ -236,3 +240,4 @@ print("-    Tests passed: " + str(tests_passed) + "                         -")
 if tests_run == tests_passed: 
 	print("-          ALL TESTS PASSED                  -")
 print("----------------------------------------------")
+
