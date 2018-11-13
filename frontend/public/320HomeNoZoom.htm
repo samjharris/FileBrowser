@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+.container1 {
+  border: 1px solid black;
+ }
+.container2 {
+  border: 3px solid black;
+  background-color: #0000ff;
+  position: absolute;
+  width: 300px;
+  height: 485px;
+  z-index: 15;
+  top: 30%;
+  left: 50%;
+  margin: -100px 0 0 -150px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  -khtml-border-radius: 6px;
+  border-radius:6px;
+}
+
+input[type=text], input[type=password] {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 2px solid black;
+  box-sizing: border-box;  
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  -khtml-border-radius: 6px;
+  border-radius:6px;
+}
+
+
+</style>
+</head>
+
+<body style=background-color:DodgerBlue>
+
+<div class =container2>
+<center> <h1> JSON DERULO </h1> </center>
+	<div class = container1>
+ 		<center><h1>User Login</h1></center>
+		<form action="/action_page.php">
+		<center> Username:<br></center>
+		<center><input type="text" style="background-color:#d6d7d8;” name="Username" placeholder=Username></center><br>
+		<center> Password:<br> </center>
+		<center><input type="password" style="background-color:#d6d7d8;”name="pwd" placeholder=Password></center><br>
+		<label>
+      			<center><input type="checkbox" checked="checked" name="remember"> Remember me</center>
+    		</label><br>
+		<center> <input type="submit" value=Login></center>
+		
+		</form><br> 
+		</div><br>
+	<center> © 2018 Copyright: FileBrowser developed for HP by University of Massachusetts </center>
+</div>
+</body>
+</html>
