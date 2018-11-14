@@ -34,11 +34,15 @@ STATUS_401 = dumps({}), 401
 # Database Setup ###############################################################
 ################################################################################
 
-MONGO_URI = "mongodb://{}:{}@{}/{}"
+MONGO_USER_URI = "mongodb://{}:{}@{}/{}"
+
+MONGO_DUMP_URI = "mongodb://{}:{}@{}/{}"
 
 MONGO_HOST = "aws.kylesilverman.com"
 
-MONGO_DATABASE = "data"
+MONGO_USER_DATABASE = "data"
+
+MONGO_DUMP_DATABASE = "dump"
 
 MONGO_USER = "json_derulo"
 
@@ -47,18 +51,27 @@ MONGO_PASSWORD = "Br0ws3r!"
 
 # create the formatted string
 
-MONGO_URI = MONGO_URI.format(
+MONGO_USER_URI = MONGO_USER_URI.format(
 
     MONGO_USER, MONGO_PASSWORD,
 
-    MONGO_HOST, MONGO_DATABASE
+    MONGO_HOST, MONGO_USER_DATABASE
+
+)
+
+MONGO_DUMP_URI = MONGO_DUMP_URI.format(
+
+    MONGO_USER, MONGO_PASSWORD,
+
+    MONGO_HOST, MONGO_DUMP_DATABASE
 
 )
 
 
 # init the connection to mongo
 
-mongo = PyMongo(app, MONGO_URI)
+mongoUser = PyMongo(app, MONGO_USER_URI)
+mongoDump = PyMongo(app, MONGO_DUMP_URI)
 
 ################################################################################
 # Logout Route #################################################################
@@ -110,13 +123,10 @@ def machines():
 
     if(authenticate_user(tenant, pswd)):
 
-        machines = mongo.db.machines.find({
-
-            # get machines with the tenant
-            
-            "tenants": tenant #session["tenant"]
-
-        })
+        machines = mongoDump.db.dataLogs.find(
+        {'authorized.tenants':tenant, 'historyIndex':1},
+        {'_id':0, 'historyIndex':0}
+        )
 
         # return data with success
         
@@ -131,7 +141,7 @@ def machines():
 ################################################################################
 # Get List of Logs #############################################################
 ################################################################################
-
+"""
 @app.route("/machines/<ssn>/logs", methods = ["POST"])
 
 def logs():
@@ -167,7 +177,7 @@ def logs():
     # unauthorized user
     
     return STATUS_401
-
+"""
 ################################################################################
 # Run App ######################################################################
 ################################################################################
@@ -184,7 +194,7 @@ def authenticate_user(tenant, pswd):
 
     # search for the user according to the query args
     
-    user = mongo.db.users.find_one({"tenant": tenant})
+    user = mongoUser.db.users.find_one({"tenant":tenant})
 
 
     if user is not None:
