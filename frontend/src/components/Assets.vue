@@ -11,27 +11,30 @@
 
 	<b-container fluid class="h-100">
 		<b-row align-h="start">
-			<b-col v-for="(item, index) in items" class="asset m-4 siz">
+			<b-col v-for="(item, index) in items" class="asset m-4 siz" v-bind:id="item.serialNumberInserv">
 
 				<b-row align-v="start">
+
 					<b-col class="text-left pl-1" cols="1">
 						<font-awesome-icon v-on:click="saveFile(index)" download v-b-tooltip.hover title="Download JSON" :icon="['fas', 'file-download']" class="hover_mouse"/>
 					</b-col>
+
 					<b-col class="text-center">
 						<b>Asset {{index+1}}</b>
 					</b-col>
+
 					<b-col class="text-left pl-1 mr-1" cols="1">
-						<font-awesome-icon :icon="['far', 'hdd']" />
+						<font-awesome-icon :icon="['far', 'hdd']" class="hover_mouse" v-bind:id="'popover_' + item.serialNumberInserv" v-b-tooltip.hover title="History"/>
 					</b-col>
 				</b-row>
 
 				<b-row>
-					<b-col class=""><u>Serial Number:</u> {{ item.ssn }}</b-col>
+					<b-col class=""><u>Serial Number:</u> {{ item.serialNumberInserv }}</b-col>
 				</b-row>
 
 				<b-row>
 					<b-col class=""><u>Tenants:</u>
-						<font v-for="(tenant, i) in item.tenants">
+						<font v-for="(tenant, i) in item.authorized.tenants">
 							<span v-if="tenant.length-2 === i || tenant.length-1 === i || tenant.length === i">
 								{{tenant}}
 							</span>
@@ -43,62 +46,47 @@
 				</b-row>
 
 				<b-row>
-					<b-col class=""><u>Last Updated:</u> {{ item.last_update.$date }}</b-col>
+					<b-col class=""><u>Last Updated:</u> {{ item.updated }}</b-col>
 				</b-row>
 
 				<b-row>
-					<b-col class="text-center">
+					<b-col class="text-center mb-1">
 						<b-button v-b-modal="'modal_' + index">
 							View more information
 						</b-button>
 					</b-col>
 				</b-row>
 
+				<b-popover v-bind:target="'popover_' + item.serialNumberInserv" triggers="click" placement="auto" title="History">
+					History shown here
+				</b-popover>
+
 				<b-modal :id="'modal_' + index" v-bind:title="'Asset ' + (index+1)" hide-footer>
 					<b-container fluid>
 						<b-tabs>
 
 						  <b-tab title="System" active>
-						  	<br>
-						  	<b-row cols="2">
-							    <b-col class="outline">
-							    	Serial Number: {{ item.ssn }}
-							    </b-col>
-							    <!--
-							    <b-col class="outline text-center">
-							    	Port Info
-							    	<br>
-							    	<b-card no-body>
-								    	<b-tabs card vertical>
-								    		<template v-for="j in 9">
-									    		<b-tab :title="j" v-if="j == 1" active><br>Tab: {{ j }}</b-tab>
-									    		<b-tab :title="j" v-else><br>Tab: {{ j }}</b-tab>
-								    		</template>
-								    	</b-tabs>
-							    	</b-card>
-							    </b-col>
-								-->
-							</b-row>
+						  	<br><tree-view :data="item.system"></tree-view>
 						  </b-tab>
 
-						  <b-tab title="Capacity" >
-						    <br>Capacity
+						  <b-tab title="Capacity">
+						    <br><tree-view :data="item.capacity"></tree-view>
 						  </b-tab>
 
 						  <b-tab title="Performance">
-						    <br>Performance
+						    <br><tree-view :data="item.performance"></tree-view>
 						  </b-tab>
 
 						  <b-tab title="Disks">
-						    <br>Disks
+						    <br><tree-view :data="item.disks"></tree-view>
 						  </b-tab>
 
 						  <b-tab title="Nodes">
-						    <br>Nodes
+						    <br><tree-view :data="item.nodes"></tree-view>
 						  </b-tab>
 
 						  <b-tab title="Authorized">
-						    <br>Authorized
+						  	<br><tree-view :data="item.authorized"></tree-view>
 						  </b-tab>
 
 						</b-tabs>
@@ -108,18 +96,25 @@
 			</b-col>
 		</b-row>
 		<b-row align-v="end" class="mt-4 mb-4">
-			<b-col class="text-center">© 2018 Copyright: FileBrowser developed for HP by University of Massachusetts</b-col>
+			<b-col class="text-center">© 2018 Copyright: FileBrowser developed for HPE by University of Massachusetts</b-col>
 		</b-row>
 	</b-container>
 </div>
 </template>
 
 <script>
+
 export default {
   name: 'Assets',
+  filters: {
+  	pretty: function(value) {
+      return JSON.stringify(value, null, 2);
+    }
+  },
   data() {
   	return {
-	  	items: []
+	  	items: [],
+	  	history: []
 	}
   },
   created: function() {
@@ -130,17 +125,18 @@ export default {
   		var tenant = this.$session.getAll().tenant
   		var password = this.$session.getAll().password
   		const path = 'http://aws.kylesilverman.com:5000/machines?'
+  		//const path = 'http://localhost:5000/machines?'
 		
   		const data = "tenant="+tenant+"&password="+password
   		this.$http.post(path+data).then(response => {
-  			//console.log(response.body)
+  			console.log(response.body)
  			var body = response.body
-  			for(var i=0; i < body.length; i++)
+  			/*for(var i=0; i < body.length; i++)
   			{
   				var date = new Date(body[i].last_update.$date);
   				var new_date = date.toISOString();
   				body[i].last_update.$date = new_date.substring(0, new_date.length-5)+"Z"
-  			}
+  			}*/
   			this.items = body;
   		}).catch(error => {
   			console.log(this.$session.getAll())
@@ -153,12 +149,9 @@ export default {
   		this.$router.push('/')
   	},
   	saveFile: function(index) {
-  		console.log("test")
   		var item_object = this.items[index];
-        const data = JSON.stringify(item_object)
-        const file_name = item_object.ssn+"-"+item_object.last_update.$date
-        window.localStorage.setItem(file_name, data);
-        console.log(JSON.parse(window.localStorage.getItem(file_name)))
+        const data = JSON.stringify(item_object, null, 2);//JSON.stringify(item_object)
+        const file_name = item_object.serialNumberInserv+"-"+item_object.updated
         return this.downloadFile(data, this.strip_time(file_name))
   	},
   	downloadFile(response, filename) {
@@ -168,7 +161,8 @@ export default {
 
 	  // IE doesn't allow using a blob object directly as link href
 	  // instead it is necessary to use msSaveOrOpenBlob
-	  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+	  if (window.navigator && window.navigator.msSaveOrOpenBlob) 
+	  {
 	    window.navigator.msSaveOrOpenBlob(newBlob)
 	    return
 	  }
@@ -180,7 +174,8 @@ export default {
 	  link.href = data
 	  link.download = filename + '.json'
 	  link.click()
-	  setTimeout(function () {
+	  setTimeout(function () 
+	  {
 	    // For Firefox it is necessary to delay revoking the ObjectURL
 	    window.URL.revokeObjectURL(data)
 	  }, 100)

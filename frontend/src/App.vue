@@ -5,8 +5,6 @@
 </template>
 
 <script>
-import Assets from './components/Assets.vue'
-import Login from './components/Login.vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 

@@ -8,6 +8,7 @@ import { faHdd } from '@fortawesome/free-regular-svg-icons'
 import router from './router'
 import VueResource from 'vue-resource'
 import VueSession from 'vue-session'
+import TreeView from "vue-json-tree-view"
 
 library.add(faFileDownload, faHdd)
 
@@ -17,6 +18,7 @@ Vue.config.productionTip = false
 Vue.use(BootstrapVue);
 Vue.use(VueResource);
 Vue.use(VueSession);
+Vue.use(TreeView)
 
 Vue.http.options.xhr = {withCredentials: true}
 Vue.http.options.crossOrigin = true
