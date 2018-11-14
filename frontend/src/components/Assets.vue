@@ -51,7 +51,7 @@
 
 				<b-row>
 					<b-col class="text-center mb-1">
-						<b-button v-b-modal="'modal_' + index">
+						<b-button v-b-modal="'myModal'" @click="sendInfo(item, index)">
 							View more information
 						</b-button>
 					</b-col>
@@ -61,43 +61,48 @@
 					History shown here
 				</b-popover>
 
-				<b-modal :id="'modal_' + index" v-bind:title="'Asset ' + (index+1)" hide-footer>
-					<b-container fluid>
-						<b-tabs>
-
-						  <b-tab title="System" active>
-						  	<br><tree-view :data="item.system"></tree-view>
-						  </b-tab>
-
-						  <b-tab title="Capacity">
-						    <br><tree-view :data="item.capacity"></tree-view>
-						  </b-tab>
-
-						  <b-tab title="Performance">
-						    <br><tree-view :data="item.performance"></tree-view>
-						  </b-tab>
-
-						  <b-tab title="Disks">
-						    <br><tree-view :data="item.disks"></tree-view>
-						  </b-tab>
-
-						  <b-tab title="Nodes">
-						    <br><tree-view :data="item.nodes"></tree-view>
-						  </b-tab>
-
-						  <b-tab title="Authorized">
-						  	<br><tree-view :data="item.authorized"></tree-view>
-						  </b-tab>
-
-						</b-tabs>
-					</b-container>
-				</b-modal>
-
 			</b-col>
 		</b-row>
 		<b-row align-v="end" class="mt-4 mb-4">
 			<b-col class="text-center">© 2018 Copyright: FileBrowser developed for HPE by University of Massachusetts</b-col>
 		</b-row>
+
+		<b-modal id="myModal" hide-footer v-bind:title="'Asset ' + (machine_index+1)">
+			<b-container fluid>
+				<b-tabs>
+
+				<b-tab title="General" active>
+					<br><tree-view :data="general_json(machine)"></tree-view>
+				</b-tab>
+
+				  <b-tab title="System">
+				  	<br><tree-view :data="machine.system"></tree-view>
+				  </b-tab>
+
+				  <b-tab title="Capacity">
+				    <br><tree-view :data="machine.capacity"></tree-view>
+				  </b-tab>
+
+				  <b-tab title="Performance">
+				    <br><tree-view :data="machine.performance"></tree-view>
+				  </b-tab>
+
+				  <b-tab title="Disks">
+				    <br><tree-view :data="machine.disks"></tree-view>
+				  </b-tab>
+
+				  <b-tab title="Nodes">
+				    <br><tree-view :data="machine.nodes"></tree-view>
+				  </b-tab>
+
+				  <b-tab title="Authorized">
+				  	<br><tree-view :data="machine.authorized"></tree-view>
+				  </b-tab>
+
+				</b-tabs>
+			</b-container>
+		</b-modal>
+
 	</b-container>
 </div>
 </template>
@@ -114,7 +119,8 @@ export default {
   data() {
   	return {
 	  	items: [],
-	  	history: []
+	  	machine: '',
+	  	machine_index: 0
 	}
   },
   created: function() {
@@ -144,6 +150,13 @@ export default {
   	}
   },
   methods: {
+  	sendInfo(machine, machine_index) {
+        this.machine = machine;
+        this.machine_index = machine_index;
+    },
+    general_json(item) {
+    	return {"serialNumberInserv": item.serialNumberInserv, "updated": item.updated, "date": item.date}
+    },
   	onLogout () {
   		this.$session.destroy()
   		this.$router.push('/')
