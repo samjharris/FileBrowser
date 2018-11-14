@@ -1,21 +1,15 @@
 <template>
   <div id="app">
-    <Assets/>
-    <Login place="America"/>
+    <router-view/>
   </div>
 </template>
 
 <script>
-import Assets from './components/Assets.vue'
-import Login from './components/Login.vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 export default {
-  name: 'app',
-  components: {
-    Assets, Login
-  }
+  name: 'app'
 }
 </script>
 

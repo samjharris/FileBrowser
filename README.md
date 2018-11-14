@@ -1,5 +1,5 @@
 # FileBrowser
-CS 320 Project Repository
+CS 320 Project Repository - <b>dev</b> branch
 
 <b>Tech Stack</b> 
 <pre>
