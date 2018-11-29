@@ -129,12 +129,12 @@ export default {
   	}
   	else {
 	       
-  		var tenant = this.$session.getAll().username
+  		var username = this.$session.getAll().username
   		var password = this.$session.getAll().password
   		const path = 'http://aws.kylesilverman.com:5000/machines?'
   		//const path = 'http://localhost:5000/machines?'
 		
-  		const data = "tenant="+tenant+"&password="+password
+  		const data = "username="+username+"&password="+password
   		this.$http.post(path+data).then(response => {
   			console.log(response.body)
  			var body = response.body
