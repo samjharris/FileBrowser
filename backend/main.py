@@ -109,11 +109,12 @@ def machines():
 
     if(authenticate_user(username, pswd)):
 
-        user = mongo.db.users.find(
+        user = mongo.db.users.findOne(
                 {'username':username}
             )
 
         tenant = user['tenant']
+        
 
         machines = mongo.db.dataLogs.find(
                 {'authorized.tenants':tenant, 'historyIndex':1},
