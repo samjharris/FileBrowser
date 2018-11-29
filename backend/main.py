@@ -34,15 +34,11 @@ STATUS_401 = dumps({}), 401
 # Database Setup ###############################################################
 ################################################################################
 
-MONGO_USER_URI = "mongodb://{}:{}@{}/{}"
-
-MONGO_DUMP_URI = "mongodb://{}:{}@{}/{}"
+MONGO_URI = "mongodb://{}:{}@{}/{}"
 
 MONGO_HOST = "aws.kylesilverman.com"
 
-MONGO_USER_DATABASE = "data"
-
-MONGO_DUMP_DATABASE = "dump"
+MONGO_DATABASE = "data"
 
 MONGO_USER = "json_derulo"
 
@@ -51,27 +47,18 @@ MONGO_PASSWORD = "Br0ws3r!"
 
 # create the formatted string
 
-MONGO_USER_URI = MONGO_USER_URI.format(
+MONGO_URI = MONGO_URI.format(
 
     MONGO_USER, MONGO_PASSWORD,
 
-    MONGO_HOST, MONGO_USER_DATABASE
-
-)
-
-MONGO_DUMP_URI = MONGO_DUMP_URI.format(
-
-    MONGO_USER, MONGO_PASSWORD,
-
-    MONGO_HOST, MONGO_DUMP_DATABASE
+    MONGO_HOST, MONGO_DATABASE
 
 )
 
 
 # init the connection to mongo
+mongo = PyMongo(app, MONGO_URI)
 
-mongoUser = PyMongo(app, MONGO_USER_URI)
-mongoDump = PyMongo(app, MONGO_DUMP_URI)
 
 ################################################################################
 # Logout Route #################################################################
@@ -95,12 +82,11 @@ def login():
 
     
     # extract the args from the query string
-    
-    tenant = request.args.get("tenant")
+    username = request.args.get("username")
 
     pswd = request.args.get("password")
 
-    if(authenticate_user(tenant, pswd)):
+    if(authenticate_user(username, pswd)):
 
         return STATUS_200
 
@@ -117,16 +103,21 @@ def login():
 
 def machines():
 
-    tenant = request.args.get("tenant")
+    username = request.args.get("username")
 
     pswd = request.args.get("password")
 
-    if(authenticate_user(tenant, pswd)):
+    if(authenticate_user(username, pswd)):
 
-        machines = mongoDump.db.dataLogs.find(
-        {'authorized.tenants':tenant, 'historyIndex':1},
-        {'_id':0, 'historyIndex':0}
-        )
+        tenant = mongo.db.users.find(
+                {'username':username},
+                {'_id':0,'username':0,'password':0}
+            )
+
+        machines = mongo.db.dataLogs.find(
+                {'authorized.tenants':tenant, 'historyIndex':1},
+                {'_id':0, 'historyIndex':0}
+            )
 
         # return data with success
         
@@ -190,11 +181,11 @@ if __name__ == "__name__":
 ################################################################################
 ################################################################################
 
-def authenticate_user(tenant, pswd):
+def authenticate_user(username, pswd):
 
     # search for the user according to the query args
     
-    user = mongoUser.db.users.find_one({"tenant":tenant})
+    user = mongo.db.users.find_one({"username":username})
 
 
     if user is not None:

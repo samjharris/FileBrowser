@@ -40,7 +40,31 @@ client = pymongo.MongoClient(MONGO_URI)
 # Database Setup ###############################################################
 ################################################################################
 
-def create(username, tenant, pswd = "password"):
+def create(argv):
+
+    if len(argv) < 3:
+
+        print("Invalid args")
+
+        # create-user.py 
+        
+        #  - <username> 
+        
+        #  - <tenant>
+        
+        #  - <password>
+
+        return "Error: args"
+
+
+    # default value
+
+    pswd = "password"
+
+    if len(argv) == 4:
+
+        pswd = argv[3]
+
 
     # hash the password for security
     
@@ -49,9 +73,9 @@ def create(username, tenant, pswd = "password"):
     
     client.data.users.insert_one({
 
-    	"username": username,
+        "username": argv[1],
 
-        "tenant": tenant,
+        "tenant": argv[2],
 
         "password": hashed
         
@@ -61,24 +85,7 @@ def create(username, tenant, pswd = "password"):
 # Parse Args ###################################################################
 ################################################################################
 
-
-if len(sys.argv) == 3:
-
-    username = sys.argv[1]
-
-    tenant = sys.argv[2]
-
-    create(username, tenant)
-
-if len(sys.argv) == 4:
-
-    username = sys.argv[1]
-
-    tenant = sys.argv[2]
-
-    psword = sys.argv[3]
-
-    create(username, tenant, psword)
+create(sys.argv)
 
 ################################################################################
 ################################################################################
