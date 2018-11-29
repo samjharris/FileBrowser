@@ -1,6 +1,6 @@
 <template>
 
-	<!-- Root component to mount to -->
+  <!-- Root component to mount to -->
 
   <div id="app"><router-view/></div>
 
@@ -10,16 +10,16 @@
 
 <script>
 
-	import 'bootstrap/dist/css/bootstrap.css'
+  import 'bootstrap/dist/css/bootstrap.css'
 
-	import 'bootstrap-vue/dist/bootstrap-vue.css'
+  import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 
-	export default {
+  export default {
 
-	  name: 'app'
+    name: 'app'
 
-	}
+  }
 
 </script>
 
@@ -27,16 +27,16 @@
 
 <style>
 
-	#app {
+  #app {
 
-	  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-	  
-	  -webkit-font-smoothing: antialiased;
-	  
-	  -moz-osx-font-smoothing: grayscale;
-	  
-	  height: 100% !important;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    
+    -webkit-font-smoothing: antialiased;
+    
+    -moz-osx-font-smoothing: grayscale;
+    
+    height: 100% !important;
 
-	}
+  }
 
 </style>
