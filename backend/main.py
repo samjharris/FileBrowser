@@ -109,7 +109,7 @@ def machines():
 
     if(authenticate_user(username, pswd)):
 
-        user = mongo.db.users.findOne(
+        user = mongo.db.users.find_one(
                 {'username':username}
             )
 
