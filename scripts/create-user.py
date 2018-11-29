@@ -61,7 +61,7 @@ def create(argv):
 
     pswd = "password"
 
-    if len(argv) == 3:
+    if len(argv) == 4:
 
         pswd = argv[3]
 
