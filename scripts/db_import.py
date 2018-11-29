@@ -19,7 +19,7 @@ EXTRACTION_DIR = "data-export-extracted"
 # MongoDB URL
 MONGO_URI = "aws.kylesilverman.com"
 # MongoDB database to use
-MONGO_DB = "dump"
+MONGO_DB = "data"
 # MongoDB user
 MONGO_USER = "json_derulo"
 # MongoDB password
