@@ -110,7 +110,7 @@ def machines():
     if(authenticate_user(username, pswd)):
 
         user = mongo.db.users.find(
-                {'username':username},
+                {'username':username}
             )
 
         tenant = user['tenant']
