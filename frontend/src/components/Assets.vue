@@ -128,7 +128,8 @@ export default {
   		this.$router.push('/')
   	}
   	else {
-  		var tenant = this.$session.getAll().tenant
+	       
+  		var tenant = this.$session.getAll().username
   		var password = this.$session.getAll().password
   		const path = 'http://aws.kylesilverman.com:5000/machines?'
   		//const path = 'http://localhost:5000/machines?'
