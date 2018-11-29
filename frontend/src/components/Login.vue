@@ -1,8 +1,8 @@
 <template>
 
-  <b-container>
+  <div class="login">
 
-    <b-form @submit.prevent="onSubmit">
+    <b-form class="login" @submit.prevent="onSubmit">
       
       <!-- Username Field -->
 
@@ -25,7 +25,7 @@
 
         label="Password" label-for="password">
         
-        <b-form-input id="password" class="input" 
+        <b-form-input id="password" class="input"
 
           type="password" v-model="form.password" required>
             
@@ -40,7 +40,7 @@
 
     </b-form>
 
-  </b-container>
+  </div>
 
 </template>
 
@@ -48,52 +48,61 @@
 
 <script>
 
-export default {
+  // 3rd party tool to build query strings
 
-  name: 'Login',
+  import queryString from 'query-string';
 
-  data() {
 
-    return {
-    
-      form: {
-    
-        username: '',
-    
-        password: ''
+  export default {
+
+    name: 'Login',
+
+    data() {
+
+      return {
+      
+        form: {
+      
+          username: '',
+      
+          password: ''
+      
+        }
+      
+      }
+
+    },
+
+
+    methods: {
+
+      onSubmit(event) {
+
+        const base = 'http://aws.kylesilverman.com:5000/login';
+
+        const endpoint = base + '?' + queryString.stringify(this.form);
+
+
+        this.$http.post(endpoint)
+
+          .then(resp => {
+            
+            this.$session.start();
+
+            this.$session.set('username', this.form.username);
+            
+            this.$session.set('password', this.form.password);
+            
+            this.$router.push({ name: 'Assets' });
+
+          })
+
+          .catch(err => {});
     
       }
     
     }
 
-  },
-
-
-  methods: {
-
-    onSubmit(event) {
-
-      const base = 'http://aws.kylesilverman.com:5000/login';
-
-      const endpoint = base + '?' + queryString.stringify(this.form);
-
-
-      this.$http.post(endpoint).then(resp => {
-        
-        this.$session.start();
-
-        this.$session.set('username', this.form.username);
-        
-        this.$session.set('password', this.form.password);
-        
-        this.$router.push({ name: 'Assets' });
-
-      });
-  
-    }
-  
   }
-
-}
 
 </script>

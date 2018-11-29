@@ -24,16 +24,16 @@
 }
 
 
-@font-face {
+.login {
 
-  font-family: "Metric";
+  width: 100%;
 
-  font-style: normal;
+  max-width: 480px;
 
-  font-weight: normal;
+  padding: 20px;
 
-  src: url('../fonts/Metric/Metric.ttf');
-  
+  margin: 0 auto;
+
 }
 
 
@@ -68,17 +68,24 @@
 }
 
 
-.input {
+.button:hover, .button:active, .button:focus {
 
-  float: all;
+  box-shadow: none !important;
+
+  border: none !important;
+
+  background: #00b388 !important;
+
+  outline: none !important;
+
+}
+
+
+.input {
 
   font-family: 'Calibri';
 
-  display: block;
-
   background: #fff;
-
-  width: 100%;
 
   border: none;
 
@@ -86,17 +93,7 @@
 
   border-radius: 0;
 
-  outline: none;
-
-  box-shadow: none;
-
   height: 36px;
-
-  margin: 0;
-
-  margin-left: -24px;
-
-  margin-right: -24px;
 
   font-size: 1rem;
   
@@ -104,7 +101,16 @@
 
   color: #333;
 
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+
+.input:active, .input:focus {
+
+  outline: none;
+
+  box-shadow: none;
+
+  -webkit-appearance: none;
 
 }
 
@@ -128,6 +134,12 @@
 
 .igroup {
 
+  cursor: pointer;
+
+  z-index: 1;
+
+  position: relative;
+
   padding: 6px 24px;
 
   border: 1px solid rgba(0, 0, 0, 0.15);
@@ -141,9 +153,26 @@
 
 .igroup:focus-within {
 
-  outline: 1px solid #2ad2c9;
+  z-index: 20;
+
+  border: 1px solid #2ad2c9;
 
 }
+
+
+.igroup > div {
+
+  position: relative;
+
+  margin-left: -24px;
+
+  margin-right: -24px;
+
+}
+
+
+
+
 
 
 .modal {
@@ -176,14 +205,6 @@
 
 }
 
-
-.login {
-  
-  max-width: 800px !important;
-  
-  transform: translate(0%, 50%);
-
-}
 
 
 .down {
