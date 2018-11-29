@@ -1,56 +1,99 @@
 <template>
-	<b-container>
-		<b-row class="down">
-			<b-col>
-				<b-form @submit="onSubmit">
-					<b-form-group id="label_username" label="Username:" label-for="username">
-						<b-form-input id="username" type="text" v-model="form.username" required placeholder="Enter username"></b-form-input>
-					</b-form-group>
 
-					<b-form-group id="label_password" label="Password:" label-for="password">
-						<b-form-input id="password" type="password" v-model="form.password" required placeholder="Enter password"></b-form-input>
-					</b-form-group>
+  <b-container>
 
-					<b-button type="submit" variant="primary">Submit</b-button>
-				</b-form>
-			</b-col>
-		</b-row>
-	</b-container>
+    <b-form @submit.prevent="onSubmit">
+      
+      <!-- Username Field -->
+
+      <b-form-group id="usernamegroup" class="igroup"
+
+        label="Username" label-for="username">
+
+        <b-form-input id="username" class="input"
+
+          type="text" v-model="form.username" required>
+
+        </b-form-input>
+      
+      </b-form-group>
+
+
+      <!-- Password Field -->
+
+      <b-form-group id="passwordgroup" class="igroup"
+
+        label="Password" label-for="password">
+        
+        <b-form-input id="password" class="input" 
+
+          type="password" v-model="form.password" required>
+            
+        </b-form-input>
+
+      </b-form-group>
+
+
+      <!-- Submit button -->
+
+      <b-button type="submit" class="button">Submit</b-button>
+
+    </b-form>
+
+  </b-container>
+
 </template>
 
+
+
 <script>
+
 export default {
+
   name: 'Login',
-  data () {
+
+  data() {
+
     return {
+    
       form: {
+    
         username: '',
+    
         password: ''
+    
       }
+    
     }
+
   },
+
+
   methods: {
-    onSubmit (evt) {
-      evt.preventDefault();
-      
-      const path = 'http://aws.kylesilverman.com:5000/login?'
-      const data = "tenant="+this.form.username+"&password="+this.form.password
-      this.$http.post(path+data).then(response => {
-      this.$session.start()
-      this.$session.set('tenant', this.form.username)
-      this.$session.set('password', this.form.password)
-      this.$router.push({
-          name: 'Assets',
-        })
-      }).catch(error => {
-      	console.log("username: "+this.form.username+" password: "+this.form.password)
-      	console.log(error)
-    })
+
+    onSubmit(event) {
+
+      const base = 'http://aws.kylesilverman.com:5000/login';
+
+      const endpoint = base + '?' + queryString.stringify(this.form);
+
+
+      this.$http.post(endpoint).then(resp => {
+        
+        this.$session.start();
+
+        this.$session.set('username', this.form.username);
+        
+        this.$session.set('password', this.form.password);
+        
+        this.$router.push({ name: 'Assets' });
+
+      });
+  
     }
+  
   }
-  /*
-  props: {
-    place: String
-  }*/
+
 }
+
 </script>
