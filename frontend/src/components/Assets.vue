@@ -58,10 +58,17 @@
 				</b-row>
 
 				<b-row>
-					<b-col class=""><u>Capacity Available:</u> {{ totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB) +"%"  }}</b-col>
+						<b-col class=""><u>Capacity Available:</u> {{ totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB) +"%"  }}</b-col>
 				</b-row>
 
-				
+				<b-row>
+							<b-col class = "">
+    							<b-progress :value= "totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB)" :variant="getVariantType(totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB))" striped :animated="animate" show-value class="mb-3"></b-progress>
+  						</b-col>
+					
+				</b-row>
+
+			
 
 				<b-row>
 					<b-col class="text-center mb-1">
@@ -182,12 +189,20 @@ export default {
         const file_name = item_object.serialNumberInserv+"-"+item_object.updated
         return this.downloadFile(data, this.strip_time(file_name))
   	},
+		getVariantType: function(availableCapacity) {
+        if (availableCapacity <= 30) {
+						console.log("Danger")
+            return "danger"
+        }
+        else {
+            return "success"
+        }
+    },
 
-		totalFreeCapacity: function(freeCapacity, totalCapacity){
-			 var percentage = (freeCapacity/totalCapacity)*100;
+		totalFreeCapacity: function(usedCapacity, totalCapacity){
+			 var percentage = ((1 -(usedCapacity/totalCapacity))*100);
 			 var per = parseInt(percentage);
-
-			 return per;
+	     return per; 
 		},
   	downloadFile(response, filename) {
 	  // It is necessary to create a new blob object with mime-type explicitly set
