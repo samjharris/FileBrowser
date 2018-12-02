@@ -15,7 +15,7 @@
 
 				<b-row align-v="start">
 
-					<b-col class="text-left pl-1" cols="1">
+					<b-col class= "text-left pl-1 mr-1" cols="1">
 						<font-awesome-icon v-on:click="saveFile(index)" download v-b-tooltip.hover title="Download JSON" :icon="['fas', 'file-download']" class="hover_mouse"/>
 					</b-col>
 
@@ -23,8 +23,16 @@
 						<b>Asset {{index+1}}</b>
 					</b-col>
 
-					<b-col class="text-left pl-1 mr-1" cols="1">
-						<font-awesome-icon :icon="['far', 'hdd']" class="hover_mouse" v-bind:id="'popover_' + item.serialNumberInserv" v-b-tooltip.hover title="History"/>
+
+					<span v-if="totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB) <= 30">
+									<b-col class="text-left pl-1" cols="1">
+										<font-awesome-icon :icon="['fas', 'exclamation-triangle']" class="red_icon_hover" v-bind:id="'popover_' + item.serialNumberInserv" v-b-tooltip.hover title="Warning: Capacity Low"/>
+				          </b-col>
+						</span>
+				
+
+				<b-col class="text-left pl-1 mr-1" cols="1">
+         	<font-awesome-icon :icon="['far', 'hdd']" class="hover_mouse" v-bind:id="'popover_' + item.serialNumberInserv" v-b-tooltip.hover title="History"/>
 					</b-col>
 				</b-row>
 
@@ -46,12 +54,11 @@
 				</b-row>
 
 				<b-row>
-					<b-col class=""><u>Last Updated:</u> {{ item.updated }}</git satb-col>
+					<b-col class=""><u>Last Updated:</u> {{ item.updated }}</b-col>
 				</b-row>
 
 				<b-row>
-					<b-col class=""><u>Capcity:</u> {{ totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB) }}</b-col>
-					<b-col class=""><u>Capcity:</u> {{ totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB) }}</b-col>
+					<b-col class=""><u>Capacity Available:</u> {{ totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB) +"%"  }}</b-col>
 				</b-row>
 
 				

@@ -24,6 +24,10 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { faHdd } from '@fortawesome/free-regular-svg-icons';
 
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
+
+library.add(faFileDownload, faHdd, faExclamationTriangle);
+
 
 
 library.add(faFileDownload, faHdd);
