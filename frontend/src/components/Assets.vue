@@ -46,8 +46,15 @@
 				</b-row>
 
 				<b-row>
-					<b-col class=""><u>Last Updated:</u> {{ item.updated }}</b-col>
+					<b-col class=""><u>Last Updated:</u> {{ item.updated }}</git satb-col>
 				</b-row>
+
+				<b-row>
+					<b-col class=""><u>Capcity:</u> {{ totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB) }}</b-col>
+					<b-col class=""><u>Capcity:</u> {{ totalFreeCapacity(item.capacity.total.usedSpaceTiB,item.capacity.total.allocatedCapacityTiB) }}</b-col>
+				</b-row>
+
+				
 
 				<b-row>
 					<b-col class="text-center mb-1">
@@ -168,6 +175,13 @@ export default {
         const file_name = item_object.serialNumberInserv+"-"+item_object.updated
         return this.downloadFile(data, this.strip_time(file_name))
   	},
+
+		totalFreeCapacity: function(freeCapacity, totalCapacity){
+			 var percentage = (freeCapacity/totalCapacity)*100;
+			 var per = parseInt(percentage);
+
+			 return per;
+		},
   	downloadFile(response, filename) {
 	  // It is necessary to create a new blob object with mime-type explicitly set
 	  // otherwise only Chrome works like it should
