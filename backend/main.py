@@ -10,11 +10,15 @@ from passlib.hash import sha256_crypt
 
 from bson.json_util import loads, dumps
 
+from flask_cors import CORS
+
 ################################################################################
 # App Setup ####################################################################
 ################################################################################
 
 app = Flask(__name__)
+#cors = CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 app.secret_key = "JsOnDeRulO"
 
@@ -53,8 +57,8 @@ MONGO_URI = MONGO_URI.format(
 
 
 # init the connection to mongo
-
 mongo = PyMongo(app, MONGO_URI)
+
 
 ################################################################################
 # Logout Route #################################################################
@@ -78,34 +82,13 @@ def login():
 
     
     # extract the args from the query string
-    
-    tenant = request.args.get("tenant")
+    username = request.args.get("username")
 
     pswd = request.args.get("password")
 
+    if(authenticate_user(username, pswd)):
 
-    # search for the user according to the query args
-    
-    user = mongo.db.users.find_one({"tenant": tenant})
-
-
-    if user is not None:
-
-        # get the pswd field
-
-        conf = user["password"]
-
-
-        if sha256_crypt.verify(pswd, conf):
-
-            # storing the session info
-            
-            session["tenant"] = tenant 
-
-            # return successful
-
-            return STATUS_200
-
+        return STATUS_200
 
     # unauthorized user
     
@@ -120,15 +103,23 @@ def login():
 
 def machines():
 
-    if "tenant" in session:
+    username = request.args.get("username")
 
-        machines = mongo.db.machines.find({
+    pswd = request.args.get("password")
 
-            # get machines with the tenant
-            
-            "tenants": session["tenant"]
+    if(authenticate_user(username, pswd)):
 
-        })
+        user = mongo.db.users.find_one(
+                {'username':username}
+            )
+
+        tenant = user['tenant']
+        
+
+        machines = mongo.db.dataLogs.find(
+                {'authorized.tenants':tenant, 'historyIndex':1},
+                {'_id':0, 'historyIndex':0}
+            )
 
         # return data with success
         
@@ -143,7 +134,7 @@ def machines():
 ################################################################################
 # Get List of Logs #############################################################
 ################################################################################
-
+"""
 @app.route("/machines/<ssn>/logs", methods = ["POST"])
 
 def logs():
@@ -179,7 +170,7 @@ def logs():
     # unauthorized user
     
     return STATUS_401
-
+"""
 ################################################################################
 # Run App ######################################################################
 ################################################################################
@@ -191,3 +182,27 @@ if __name__ == "__name__":
 ################################################################################
 ################################################################################
 ################################################################################
+
+def authenticate_user(username, pswd):
+
+    # search for the user according to the query args
+    
+    user = mongo.db.users.find_one({"username":username})
+
+
+    if user is not None:
+
+        # get the pswd field
+
+        conf = user["password"]
+
+
+        if sha256_crypt.verify(pswd, conf):
+
+            # return successful
+
+            return True
+
+    # unauthorized user
+    
+    return False
