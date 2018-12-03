@@ -17,6 +17,7 @@ from bson.json_util import loads, dumps
 app = Flask(__name__)
 
 app.secret_key = "JsOnDeRulO"
+app.config["WTF_CSRF_METHODS"] = []
 
 ################################################################################
 # Status Codes #################################################################
@@ -43,13 +44,7 @@ MONGO_PASSWORD = "Br0ws3r!"
 
 # create the formatted string
 
-MONGO_URI = MONGO_URI.format(
-
-    MONGO_USER, MONGO_PASSWORD,
-
-    MONGO_HOST, MONGO_DATABASE
-
-)
+MONGO_URI = MONGO_URI.format(MONGO_USER, MONGO_PASSWORD, MONGO_HOST, MONGO_DATABASE)
 
 
 # init the connection to mongo
@@ -60,34 +55,32 @@ mongo = PyMongo(app, MONGO_URI)
 # Logout Route #################################################################
 ################################################################################
 
-@app.route("/logout", methods = ["POST"])
 
+@app.route("/logout", methods=["POST"])
 def logout():
 
     session.clear()
 
     return STATUS_200
 
+
 ################################################################################
 # Login Route ##################################################################
 ################################################################################
 
-@app.route("/login", methods = ["POST"])
 
+@app.route("/login", methods=["POST"])
 def login():
 
-    
     # extract the args from the query string
-    
+
     tenant = request.args.get("tenant")
 
     pswd = request.args.get("password")
 
-
     # search for the user according to the query args
-    
-    user = mongo.db.users.find_one({"tenant": tenant})
 
+    user = mongo.db.users.find_one({"tenant": tenant})
 
     if user is not None:
 
@@ -95,48 +88,44 @@ def login():
 
         conf = user["password"]
 
-
         if sha256_crypt.verify(pswd, conf):
 
             # storing the session info
-            
-            session["tenant"] = tenant 
+
+            session["tenant"] = tenant
 
             # return successful
 
             return STATUS_200
 
-
     # unauthorized user
-    
+
     return STATUS_401
-    
+
 
 ################################################################################
 # Get List of Machines #########################################################
 ################################################################################
 
-@app.route("/machines", methods = ["POST"])
 
+@app.route("/machines", methods=["POST"])
 def machines():
 
     if "tenant" in session:
 
-        machines = mongo.db.machines.find({
-
-            # get machines with the tenant
-            
-            "tenants": session["tenant"]
-
-        })
+        machines = mongo.db.machines.find(
+            {
+                # get machines with the tenant
+                "tenants": session["tenant"]
+            }
+        )
 
         # return data with success
-        
+
         return dumps(machines), 200
 
-
     # unauthorized user
-    
+
     return STATUS_401
 
 
@@ -144,8 +133,8 @@ def machines():
 # Get List of Logs #############################################################
 ################################################################################
 
-@app.route("/machines/<ssn>/logs", methods = ["POST"])
 
+@app.route("/machines/<ssn>/logs", methods=["POST"])
 def logs():
 
     if "tenant" in session:
@@ -154,31 +143,27 @@ def logs():
 
         machine = mongo.db.machines.find_one({"ssn": ssn})
 
-
         if machine is not None:
 
-            logs = mongo.db.logs({
-
-                # get objects from logs prop
-
-                "_id": {"$in": machine.logs}
-
-            }) 
-
+            logs = mongo.db.logs(
+                {
+                    # get objects from logs prop
+                    "_id": {"$in": machine.logs}
+                }
+            )
 
             # return machine's logs
 
             return dumps(logs), 200
 
-
         # ssn non-existant
 
         return STATUS_200
 
-
     # unauthorized user
-    
+
     return STATUS_401
+
 
 ################################################################################
 # Run App ######################################################################
@@ -186,7 +171,7 @@ def logs():
 
 if __name__ == "__name__":
 
-    app.run(debug = True)
+    app.run(debug=True)
 
 ################################################################################
 ################################################################################
