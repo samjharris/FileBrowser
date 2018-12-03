@@ -1,7 +1,7 @@
 <template>
 <div>
 	<b-navbar variant="dark" type="dark">
-		<b-navbar-brand tag="h1" class="mb-0">JSON Derulo</b-navbar-brand>
+		<b-navbar-brand tag="h1" class="mb-0">FileBrowser</b-navbar-brand>
 		<b-navbar-brand tag="h3" class="mb-0"> 
 			<b-form @submit="onLogout">
 				<b-button type="submit">Logout</b-button>
@@ -20,8 +20,16 @@
 					</b-col>
 
 					<b-col class="text-center">
-						<b>Asset {{index+1}}</b>
+								<b>{{item.system.companyName}}</b>	
 					</b-col>
+
+
+					<span v-if="parseFltFreeCapacity(item.capacity.total.freePct) <= 30">
+						<b-col class="text-left pl-1" cols="1">
+								<font-awesome-icon :icon="['fas', 'exclamation-triangle']" class="red_icon_hover" v-b-tooltip.hover title="Warning: Capacity Low"/>
+				        </b-col>
+					</span>
+
 
 					<b-col class="text-left pl-1 mr-1" cols="1">
 						<font-awesome-icon :icon="['far', 'hdd']" class="hover_mouse" v-bind:id="'popover_' + item.serialNumberInserv" v-b-tooltip.hover title="History"/>
@@ -29,11 +37,11 @@
 				</b-row>
 
 				<b-row>
-					<b-col class=""><u>Serial Number:</u> {{ item.serialNumberInserv }}</b-col>
+					<b-col class=""><b>Serial Number:</b> {{ item.serialNumberInserv }}</b-col>
 				</b-row>
 
 				<b-row>
-					<b-col class=""><u>Tenants:</u>
+					<b-col class=""><b>Tenants:</b>
 						<font v-for="(tenant, i) in item.authorized.tenants">
 							<span v-if="tenant.length-2 === i || tenant.length-1 === i || tenant.length === i">
 								{{tenant}}
@@ -46,7 +54,20 @@
 				</b-row>
 
 				<b-row>
-					<b-col class=""><u>Last Updated:</u> {{ item.updated }}</b-col>
+					<b-col class=""><b>Last Updated:</b> {{ item.updated }}</b-col>
+				</b-row>
+
+
+				<b-row>
+					<b-col class="">
+						<b>Capacity Available:</b> {{ parseFltFreeCapacity(item.capacity.total.freePct) +"%"  }}
+					</b-col>
+				</b-row>
+
+				<b-row>
+					<b-col class = "">
+    							<b-progress :value= "parseIntFreeCapacity(item.capacity.total.freePct)" :variant="getVariantType(parseIntFreeCapacity(item.capacity.total.freePct))" striped :animated="animate" show-value class="mb-3"></b-progress>
+  					</b-col>
 				</b-row>
 
 				<b-row>
@@ -63,9 +84,8 @@
 
 			</b-col>
 		</b-row>
-		<b-row align-v="end" class="mt-4 mb-4">
-			<b-col class="text-center">© 2018 Copyright: FileBrowser developed for HPE by University of Massachusetts</b-col>
-		</b-row>
+
+		
 
 		<b-modal id="myModal" hide-footer v-bind:title="'Asset ' + (machine_index+1)">
 			<b-container fluid>
@@ -103,7 +123,24 @@
 			</b-container>
 		</b-modal>
 
+			<b-col class="text-center">
+					<h3>{{ this.emptyBodyText }}</h3>			
+			</b-col>
+
 	</b-container>
+
+	<b-navbar variant="dark" type="dark">		
+			<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
+			
+			<b-pagination size="lg" :total-rows="500" v-model="currentPage" :per-page="20" hide-ellipsis hide-goto-end-buttons>
+    		</b-pagination>
+
+  			<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
+	</b-navbar>
+		
+	<b-row align-v="end" class="mt-4 mb-4">
+			<b-col class="text-center">© 2018 Copyright: FileBrowser developed for HPE by JSON_Derulo, University of Massachusetts</b-col>
+	</b-row>
 </div>
 </template>
 
@@ -120,7 +157,10 @@ export default {
   	return {
 	  	items: [],
 	  	machine: '',
-	  	machine_index: 0
+	  	machine_index: 0,
+	  	currentPage:1,
+	  	lastPage:1,
+	  	emptyBodyText:""
 	}
   },
   created: function() {
@@ -130,23 +170,43 @@ export default {
   	else {
   		var username = this.$session.getAll().username
   		var password = this.$session.getAll().password
-  		const path = 'http://aws.kylesilverman.com:5000/machines?'
-  		//const path = 'http://localhost:5000/machines?'
-		
-  		const data = "username="+username+"&password="+password
+  		//const path = 'http://aws.kylesilverman.com:5000/machines?'
+  		const path = 'http://localhost:5000/machines?'
+  		const data = "username="+username+"&password="+password+"&page="+this.currentPage
   		this.$http.post(path+data).then(response => {
   			console.log(response.body)
  			var body = response.body
-  			/*for(var i=0; i < body.length; i++)
-  			{
-  				var date = new Date(body[i].last_update.$date);
-  				var new_date = date.toISOString();
-  				body[i].last_update.$date = new_date.substring(0, new_date.length-5)+"Z"
-  			}*/
   			this.items = body;
   		}).catch(error => {
   			console.log(this.$session.getAll())
   		})
+  	}
+  },
+  updated: function() {
+  	if(this.currentPage != this.lastPage){
+  		this.lastPage = this.currentPage
+  		if (!this.$session.exists()) {
+  			this.$router.push('/')
+  		}
+  		else {
+  			var username = this.$session.getAll().username
+  			var password = this.$session.getAll().password
+  			//const path = 'http://aws.kylesilverman.com:5000/machines?'
+  			const path = 'http://localhost:5000/machines?'
+  			const data = "username="+username+"&password="+password+"&page="+this.currentPage
+  			this.$http.post(path+data).then(response => {
+  				console.log(response.body)
+ 				var body = response.body
+  				this.items = body;
+  				if(body.length === 0){
+  					this.emptyBodyText = "There are no more systems to display. Please navigate to a previous page."
+  				}else{
+  					this.emptyBodyText = ""
+  				}
+  			}).catch(error => {
+  				console.log(this.$session.getAll())
+  			})
+  		}
   	}
   },
   methods: {
@@ -167,6 +227,21 @@ export default {
         const file_name = item_object.serialNumberInserv+"-"+item_object.updated
         return this.downloadFile(data, this.strip_time(file_name))
   	},
+  	getVariantType: function(availableCapacity) {
+        if (availableCapacity <= 30) {
+						console.log("Danger")
+            return "danger"
+        }
+        else {
+            return "success"
+        }
+    },
+    parseIntFreeCapacity: function(freePct){
+	     return Math.round(freePct);
+	},
+	parseFltFreeCapacity: function(freePct){
+	     return freePct.toFixed(2); 
+	},
   	downloadFile(response, filename) {
 	  // It is necessary to create a new blob object with mime-type explicitly set
 	  // otherwise only Chrome works like it should

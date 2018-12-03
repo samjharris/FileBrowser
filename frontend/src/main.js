@@ -24,7 +24,15 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { faHdd } from '@fortawesome/free-regular-svg-icons';
 
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons'
 
+library.add(faFileDownload, faHdd, faExclamationTriangle);
+
+import VueChartkick from 'vue-chartkick'
+
+import Chart from 'chart.js'
+
+Vue.use(VueChartkick, {adapter: Chart})
 
 library.add(faFileDownload, faHdd);
 

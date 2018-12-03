@@ -55,6 +55,9 @@ MONGO_URI = MONGO_URI.format(
 
 )
 
+# paging variables
+
+SYS_PER_PAGE = 20
 
 # init the connection to mongo
 mongo = PyMongo(app, MONGO_URI)
@@ -107,18 +110,27 @@ def machines():
 
     pswd = request.args.get("password")
 
+    pagenum = int(request.args.get("page"))
+
     if(authenticate_user(username, pswd)):
 
-        user = mongo.db.users.find(
+        user = mongo.db.users.find_one(
                 {'username':username}
             )
 
         tenant = user['tenant']
 
         machines = mongo.db.dataLogs.find(
-                {'authorized.tenants':tenant, 'historyIndex':1},
-                {'_id':0, 'historyIndex':0}
-            )
+                	{'authorized.tenants':tenant, 'historyIndex':1},
+                	{'_id':0, 'historyIndex':0}
+            	).sort(
+            		'capacity.total.freePct'
+            	).skip(
+            		(pagenum - 1) * SYS_PER_PAGE
+            	).limit(
+            		SYS_PER_PAGE
+            	)
+
 
         # return data with success
         

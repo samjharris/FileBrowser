@@ -272,9 +272,15 @@
 
 }
 
+.red_icon_hover{
+  color: red; 
+  cursor: pointer; 
+}
+
 
 .hover_mouse {
   
   cursor: pointer;
+  
 
 }
