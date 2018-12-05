@@ -66,10 +66,13 @@
 
 				<b-row>
 					<b-col class = "">
-    							<b-progress :value= "parseIntFreeCapacity(item.capacity.total.freePct)" :variant="getVariantType(parseIntFreeCapacity(item.capacity.total.freePct))" striped :animated="animate" show-value class="mb-3"></b-progress>
-  					</b-col>
+						<b-progress class="mt-1" :max="max" show-value>
+							<b-progress-bar :value="parseFloat(parseFltFreeCapacity(item.capacity.total.freePct))" variant="success"></b-progress-bar>
+      						<b-progress-bar :value="100-parseFloat(parseFltFreeCapacity(item.capacity.total.freePct))" variant="danger"></b-progress-bar>
+    					</b-progress>
+    				</b-col>
 				</b-row>
-
+				
 				<b-row>
 					<b-col class="text-center mb-1">
 						<b-button v-b-modal="'myModal'" @click="sendInfo(item, index)">
@@ -132,7 +135,7 @@
 	<b-navbar variant="dark" type="dark">		
 			<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
 			
-			<b-pagination size="lg" :total-rows="500" v-model="currentPage" :per-page="20" hide-ellipsis hide-goto-end-buttons>
+			<b-pagination size="lg" :total-rows="numSystems" v-model="currentPage" :per-page="20" hide-ellipsis hide-goto-end-buttons>
     		</b-pagination>
 
   			<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
@@ -158,9 +161,10 @@ export default {
 	  	items: [],
 	  	machine: '',
 	  	machine_index: 0,
-	  	currentPage:1,
+	  	currentPage: 1,
 	  	lastPage:1,
-	  	emptyBodyText:""
+	  	emptyBodyText:"",
+	  	numSystems:Number.MAX_VALUE //don't change this, this is spegetti code
 	}
   },
   created: function() {
@@ -170,13 +174,20 @@ export default {
   	else {
   		var username = this.$session.getAll().username
   		var password = this.$session.getAll().password
+  		var page = this.$session.getAll().page
+  		this.currentPage = parseInt(page)
   		//const path = 'http://aws.kylesilverman.com:5000/machines?'
   		const path = 'http://localhost:5000/machines?'
-  		const data = "username="+username+"&password="+password+"&page="+this.currentPage
+  		const data = "username="+username+"&password="+password+"&page="+page
+
+  		console.log("Page from session: " + page);
+  		console.log("CurrentPage for v-model: " + this.currentPage)
+  		
   		this.$http.post(path+data).then(response => {
   			console.log(response.body)
  			var body = response.body
-  			this.items = body;
+ 			this.numSystems = body.numSystems;
+  			this.items = body.machines;
   		}).catch(error => {
   			console.log(this.$session.getAll())
   		})
@@ -191,13 +202,16 @@ export default {
   		else {
   			var username = this.$session.getAll().username
   			var password = this.$session.getAll().password
+
   			//const path = 'http://aws.kylesilverman.com:5000/machines?'
   			const path = 'http://localhost:5000/machines?'
   			const data = "username="+username+"&password="+password+"&page="+this.currentPage
+  			this.$session.set('page', this.currentPage);
   			this.$http.post(path+data).then(response => {
   				console.log(response.body)
  				var body = response.body
-  				this.items = body;
+ 				this.numSystems = body.numSystems;
+  				this.items = body.machines;
   				if(body.length === 0){
   					this.emptyBodyText = "There are no more systems to display. Please navigate to a previous page."
   				}else{

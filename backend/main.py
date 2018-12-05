@@ -131,10 +131,13 @@ def machines():
             		SYS_PER_PAGE
             	)
 
+        numSystems = int(machines.count())
+
+        datadump = {'numSystems':numSystems,'machines':machines}
 
         # return data with success
         
-        return dumps(machines), 200
+        return dumps(datadump), 200
 
 
     # unauthorized user
