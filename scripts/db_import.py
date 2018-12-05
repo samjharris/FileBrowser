@@ -106,6 +106,16 @@ for cur_properLog in json_dicts:
 
   # if there are other logs we must re-order the history indexes 
   else:
+    #quick sanity check: does the same serialnumber and date combo
+    #already exist in this database? if so, we are about to add
+    #a duplicate so just skip to the next element
+    cont = False
+    for cur_dbLog in list_matching_dbLog:
+      if dateutil.parser.parse(cur_properLog['date']) == cur_dbLog['date']:
+        cont = True
+        break
+    if cont:
+      continue
 
     # add identifying information about the current proper log file
     # into the list of logs with matching serial numbers, for ordering
