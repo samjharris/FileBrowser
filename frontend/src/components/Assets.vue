@@ -1,45 +1,101 @@
 <template>
 <div>
-	<b-navbar variant="dark" type="dark">
-		<b-navbar-brand tag="h1" class="mb-0">FileBrowser</b-navbar-brand>
-		<b-navbar-brand tag="h3" class="mb-0"> 
-			<b-form @submit="onLogout">
-				<b-button type="submit">Logout</b-button>
-			</b-form>
-		</b-navbar-brand>
+
+	<!------------------>
+	<!-- BEGIN HEADER -->
+	<!------------------>
+	<b-navbar toggleable="md" type="dark" variant="dark">
+  		<b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+  		
+  		<!-- TITLE -->
+  		<b-navbar-brand href="#">FileBrowser</b-navbar-brand>
+  		<b-collapse is-nav id="nav_collapse">
+			<b-navbar-nav class="ml-auto">
+				
+				<!-- SORT ORDER DROPDOWN -->
+    			<b-dropdown variant="link" size="lg" no-caret>
+    				<template slot="button-content"><font-awesome-icon :icon="this.sortByIcon"/>
+    					<span class="sr-only">Filter</span>
+    				</template>
+    					<b-dropdown-item v-on:click="setSort('fslh')">Free space: Low to High</b-dropdown-item>
+    					<b-dropdown-item v-on:click="setSort('fshl')">Free space: High to Low</b-dropdown-item>
+    					<b-dropdown-item v-on:click="setSort('snlh')">Serial number: Low to High</b-dropdown-item>
+    					<b-dropdown-item v-on:click="setSort('snhl')">Serial number: High to Low</b-dropdown-item>
+    					<b-dropdown-item v-on:click="setSort('cnaz')">Company name: A to Z</b-dropdown-item>
+    					<b-dropdown-item v-on:click="setSort('cnza')">Company name: Z to A</b-dropdown-item>
+  				</b-dropdown>
+
+  				<!-- SEARCH FORM/BUTTON -->
+      			<b-nav-form>
+        			<b-form-input size="md" class="mr-md-2" type="text" v-model="searchForm" placeholder="serial # or company name"/></b-form-input>
+        			<b-button size="md" class="my-2 my-md-0" type="button" v-on:click="onSearch">Search</b-button>
+      			</b-nav-form>
+
+      	        <!-- LOGOUT BUTTON -->
+      			<b-navbar-brand tag="h3" class="mb-0 px-2"> 
+					<b-form @submit="onLogout">
+						<b-button type="submit">Logout</b-button>
+					</b-form>
+				</b-navbar-brand>
+
+      		</b-navbar-nav>
+  		</b-collapse>
 	</b-navbar>
 
+	<!----------------------->
+	<!-- BEGIN SEARCH TEXT -->
+	<!----------------------->
+	<b-row v-show="this.isSearch && !showSpinner">
+		<b-col class="text-center">
+				<br>
+				<h3>Showing results for &quot;{{ this.searchInput }}&quot; &nbsp; 
+					<font-awesome-icon v-on:click="clearSearch" v-b-tooltip.hover title="Clear search" :icon="['fas', 'times-circle']" class="hover_mouse"/> 
+				</h3>	
+						
+		</b-col>
+	</b-row>	
+
+	<!--------------------------->
+	<!-- BEGIN ASSET CONTAINER -->
+	<!--------------------------->
 	<b-container fluid class="h-100">
-		<b-row align-h="start">
+		<!-- ASSET GRID -->
+		<b-row align-h="start" v-show="!showSpinner">
 			<b-col v-for="(item, index) in items" class="asset m-4 siz" v-bind:id="item.serialNumberInserv">
 
+				<!-- ICONS/TITLE -->
 				<b-row align-v="start">
 
+					<!-- DOWNLOAD ICON -->
 					<b-col class="text-left pl-1" cols="1">
 						<font-awesome-icon v-on:click="saveFile(index)" download v-b-tooltip.hover title="Download JSON" :icon="['fas', 'file-download']" class="hover_mouse"/>
 					</b-col>
 
+					<!-- ASSET TITLE -->
 					<b-col class="text-center">
-								<b>{{item.system.companyName}}</b>	
+						<b>{{item.system.companyName}}</b>	
 					</b-col>
 
-
+					<!-- CAPACITY WARNING -->
 					<span v-if="parseFltFreeCapacity(item.capacity.total.freePct) <= 30">
 						<b-col class="text-left pl-1" cols="1">
-								<font-awesome-icon :icon="['fas', 'exclamation-triangle']" class="red_icon_hover" v-b-tooltip.hover title="Warning: Capacity Low"/>
+							<font-awesome-icon :icon="['fas', 'exclamation-triangle']" class="red_icon_hover" v-b-tooltip.hover title="Warning: Capacity Low"/>
 				        </b-col>
 					</span>
 
-
+					<!-- HISTORY ICON -->
 					<b-col class="text-left pl-1 mr-1" cols="1">
 						<font-awesome-icon :icon="['far', 'hdd']" class="hover_mouse" v-bind:id="'popover_' + item.serialNumberInserv" v-b-tooltip.hover title="History"/>
 					</b-col>
+
 				</b-row>
 
+				<!-- SERIAL NUMBER -->
 				<b-row>
 					<b-col class=""><b>Serial Number:</b> {{ item.serialNumberInserv }}</b-col>
 				</b-row>
 
+				<!-- TENANT LIST -->
 				<b-row>
 					<b-col class=""><b>Tenants:</b>
 						<font v-for="(tenant, i) in item.authorized.tenants">
@@ -53,26 +109,31 @@
 					</b-col>
 				</b-row>
 
+				<!-- LAST UPDATE -->
 				<b-row>
-					<b-col class=""><b>Last Updated:</b> {{ item.updated }}</b-col>
+					<b-col class="">
+						<b>Last Updated:</b> {{ item.updated }}
+					</b-col>
 				</b-row>
 
-
+				<!-- CAPACITY AVAILABLE -->
 				<b-row>
 					<b-col class="">
 						<b>Capacity Available:</b> {{ parseFltFreeCapacity(item.capacity.total.freePct) +"%"  }}
 					</b-col>
 				</b-row>
 
+				<!-- CAPACITY GRAPH -->
 				<b-row>
 					<b-col class = "">
-						<b-progress class="mt-1" :max="max" show-value>
+						<b-progress class="mt-1" show-value>
 							<b-progress-bar :value="parseFloat(parseFltFreeCapacity(item.capacity.total.freePct))" variant="success"></b-progress-bar>
       						<b-progress-bar :value="100-parseFloat(parseFltFreeCapacity(item.capacity.total.freePct))" variant="danger"></b-progress-bar>
     					</b-progress>
     				</b-col>
 				</b-row>
 				
+				<!-- MORE INFORMATION BUTTON -->
 				<b-row>
 					<b-col class="text-center mb-1">
 						<b-button v-b-modal="'myModal'" @click="sendInfo(item, index)">
@@ -81,69 +142,82 @@
 					</b-col>
 				</b-row>
 
+				<!-- HISTORY POPOVER -->
 				<b-popover v-bind:target="'popover_' + item.serialNumberInserv" triggers="click" placement="auto" title="History">
 					History shown here
 				</b-popover>
 
 			</b-col>
 		</b-row>
-
-		
-
+	
+		<!-- MORE INFORMATION MODAL -->
 		<b-modal id="myModal" hide-footer v-bind:title="'Asset ' + (machine_index+1)">
 			<b-container fluid>
 				<b-tabs>
+					<b-tab title="General" active>
+						<br><tree-view :data="general_json(machine)"></tree-view>
+					</b-tab>
 
-				<b-tab title="General" active>
-					<br><tree-view :data="general_json(machine)"></tree-view>
-				</b-tab>
+				  	<b-tab title="System">
+				  		<br><tree-view :data="machine.system"></tree-view>
+				  	</b-tab>
 
-				  <b-tab title="System">
-				  	<br><tree-view :data="machine.system"></tree-view>
-				  </b-tab>
+				  	<b-tab title="Capacity">
+				    	<br><tree-view :data="machine.capacity"></tree-view>
+				  	</b-tab>
 
-				  <b-tab title="Capacity">
-				    <br><tree-view :data="machine.capacity"></tree-view>
-				  </b-tab>
+				  	<b-tab title="Performance">
+				    	<br><tree-view :data="machine.performance"></tree-view>
+				  	</b-tab>
 
-				  <b-tab title="Performance">
-				    <br><tree-view :data="machine.performance"></tree-view>
-				  </b-tab>
+				  	<b-tab title="Disks">
+				    	<br><tree-view :data="machine.disks"></tree-view>
+				  	</b-tab>
 
-				  <b-tab title="Disks">
-				    <br><tree-view :data="machine.disks"></tree-view>
-				  </b-tab>
+				  	<b-tab title="Nodes">
+				    	<br><tree-view :data="machine.nodes"></tree-view>
+				  	</b-tab>
 
-				  <b-tab title="Nodes">
-				    <br><tree-view :data="machine.nodes"></tree-view>
-				  </b-tab>
-
-				  <b-tab title="Authorized">
-				  	<br><tree-view :data="machine.authorized"></tree-view>
-				  </b-tab>
-
+				  	<b-tab title="Authorized">
+				  		<br><tree-view :data="machine.authorized"></tree-view>
+				  	</b-tab>
 				</b-tabs>
 			</b-container>
 		</b-modal>
 
-			<b-col class="text-center">
-					<h3>{{ this.emptyBodyText }}</h3>			
+		<!-- SPINNER ROW -->
+		<b-row id="row_for_spinner">
+			<b-col v-show="showSpinner">
+				<br><br><br>
+				<div align-self="center" class="loader" id="spinner"></div>
+				<br><br><br>
 			</b-col>
-
+		</b-row>
 	</b-container>
 
-	<b-navbar variant="dark" type="dark">		
-			<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
+	<!------------------------------>
+	<!-- BEGIN PAGINATION NAV BAR -->
+	<!------------------------------>
+	<b-navbar variant="dark" type="dark">	
+		<!-- SPACER LEFT -->
+		<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
 			
-			<b-pagination size="lg" :total-rows="numSystems" v-model="currentPage" :per-page="20" hide-ellipsis hide-goto-end-buttons>
-    		</b-pagination>
+		<!-- PAGINATION COMPONENT -->
+		<b-pagination size="lg" :total-rows="numSystems" v-model="currentPage" :per-page="20"></b-pagination>
 
-  			<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
+    	<!-- SPACER RIGHT -->
+  		<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
 	</b-navbar>
 		
+	<!------------------>
+	<!-- BEGIN FOOTER -->
+	<!------------------>
 	<b-row align-v="end" class="mt-4 mb-4">
-			<b-col class="text-center">© 2018 Copyright: FileBrowser developed for HPE by JSON_Derulo, University of Massachusetts</b-col>
+		<b-col class="text-center">
+			© 2018 Copyright: FileBrowser developed for HPE by JSON_Derulo, University of Massachusetts
+		</b-col>
 	</b-row>
+
 </div>
 </template>
 
@@ -162,11 +236,25 @@ export default {
 	  	machine: '',
 	  	machine_index: 0,
 	  	currentPage: 1,
-	  	lastPage:1,
-	  	emptyBodyText:"",
-	  	numSystems:Number.MAX_VALUE //don't change this, this is spegetti code
+	  	lastPage: 1,
+	  	emptyBodyText: "",
+	  	numSystems: Number.MAX_VALUE, //don't change this, this is spegetti code
+	  	sortByCode: 'fslh',
+	  	lastSortByCode: 'fslh',
+	  	sortByIcon: ['fas', 'sort-amount-up'],
+	  	searchInput: '',
+	  	searchForm:'',
+	  	isSearch:false,
+	  	showSpinner: true
 	}
   },
+
+
+//FOR HISTORY:
+//const path = 'http://localhost:5000/history?'
+//const data = "username="+username+"&password="+password+"&sni="+serialNumberInserv_to_get_history_for
+
+
   created: function() {
   	if (!this.$session.exists()) {
   		this.$router.push('/')
@@ -175,27 +263,37 @@ export default {
   		var username = this.$session.getAll().username
   		var password = this.$session.getAll().password
   		var page = this.$session.getAll().page
+  		var sort = this.$session.getAll().sort
   		this.currentPage = parseInt(page)
+  		this.setSort(sort)
+  		this.lastSortByCode = sort
   		//const path = 'http://aws.kylesilverman.com:5000/machines?'
   		const path = 'http://localhost:5000/machines?'
-  		const data = "username="+username+"&password="+password+"&page="+page
-
-  		console.log("Page from session: " + page);
-  		console.log("CurrentPage for v-model: " + this.currentPage)
+  		const data = "username="+username+"&password="+password+"&page="+page+"&sort="+sort
+  		
   		
   		this.$http.post(path+data).then(response => {
-  			console.log(response.body)
- 			var body = response.body
+
+ 			var body = response.body;
  			this.numSystems = body.numSystems;
   			this.items = body.machines;
+  			this.showSpinner = false;
+
   		}).catch(error => {
   			console.log(this.$session.getAll())
   		})
   	}
   },
   updated: function() {
-  	if(this.currentPage != this.lastPage){
+  	if(this.currentPage != this.lastPage || this.sortByCode != this.lastSortByCode){
+  		
+  		this.showSpinner = true;
+  		
+  		if(this.sortByCode != this.lastSortByCode){ this.currentPage = 1 }
+
   		this.lastPage = this.currentPage
+  		this.lastSortByCode = this.sortByCode
+
   		if (!this.$session.exists()) {
   			this.$router.push('/')
   		}
@@ -205,10 +303,13 @@ export default {
 
   			//const path = 'http://aws.kylesilverman.com:5000/machines?'
   			const path = 'http://localhost:5000/machines?'
-  			const data = "username="+username+"&password="+password+"&page="+this.currentPage
+  			const data = "username="+username+"&password="+password+"&page="+this.currentPage+"&sort="+this.sortByCode
+
   			this.$session.set('page', this.currentPage);
+  			this.$session.set('sort', this.sortByCode);
+
   			this.$http.post(path+data).then(response => {
-  				console.log(response.body)
+ 
  				var body = response.body
  				this.numSystems = body.numSystems;
   				this.items = body.machines;
@@ -217,6 +318,7 @@ export default {
   				}else{
   					this.emptyBodyText = ""
   				}
+  				this.showSpinner = false;
   			}).catch(error => {
   				console.log(this.$session.getAll())
   			})
@@ -224,6 +326,40 @@ export default {
   	}
   },
   methods: {
+  	show_spin() {
+    	this.showSpinner = true;
+    },
+  	onSearch(){
+  	    this.isSearch = true;
+  		this.searchInput = this.searchForm;
+  		this.searchForm = "";
+
+  	},
+  	clearSearch(){
+  		this.isSearch = false;
+  	},
+  	setSort(val){
+
+  		if(val === 'fslh'){
+  			this.sortByIcon = ['fas', 'sort-amount-up']
+  			this.sortByCode = 'fslh'
+  		}else if(val === 'fshl'){
+  			this.sortByIcon = ['fas', 'sort-amount-down']
+  			this.sortByCode = 'fshl'
+  		}else if(val === 'snlh'){
+  			this.sortByIcon = ['fas', 'sort-numeric-down']
+  			this.sortByCode = 'snlh'
+  		}else if(val === 'snhl'){
+  			this.sortByIcon = ['fas', 'sort-numeric-up']
+  			this.sortByCode = 'snhl'
+  		}else if(val === 'cnaz'){
+  			this.sortByIcon = ['fas', 'sort-alpha-down']
+  			this.sortByCode = 'cnaz'
+  		}else if(val === 'cnza'){
+  			this.sortByIcon = ['fas', 'sort-alpha-up']
+  			this.sortByCode = 'cnza'
+  		}
+  	},
   	sendInfo(machine, machine_index) {
         this.machine = machine;
         this.machine_index = machine_index;
