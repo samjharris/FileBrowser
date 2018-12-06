@@ -58,13 +58,13 @@
 	<!--------------------------->
 	<!-- BEGIN ASSET CONTAINER -->
 	<!--------------------------->
-	<b-container fluid class="h-100">
+	<b-container fluid class="asset-parent h-100">
 		<!-- ASSET GRID -->
 		<b-row align-h="start" v-show="!showSpinner">
 			<b-col v-for="(item, index) in items" class="asset m-4 siz" v-bind:id="item.serialNumberInserv">
 
 				<!-- ICONS/TITLE -->
-				<b-row align-v="start">
+				<b-row class="info" align-v="start">
 
 					<!-- DOWNLOAD ICON -->
 					<b-col class="text-left pl-1" cols="1">

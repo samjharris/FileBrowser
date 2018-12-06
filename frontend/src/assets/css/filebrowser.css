@@ -1,6 +1,6 @@
 @font-face {
 
-  font-family: "HP Simplified";
+  font-family: 'HP Simplified';
 
   font-style: normal;
 
@@ -13,7 +13,7 @@
 
 @font-face {
 
-  font-family: "HP Simplified";
+  font-family: 'HP Simplified';
 
   font-style: normal;
 
@@ -21,6 +21,20 @@
 
   src: url('../fonts/HP Simplified/HPSimplified_Rg.ttf');
   
+}
+
+
+.asset .row {
+
+  background: #fff;
+
+}
+
+
+.asset-parent {
+
+  background: #efefef !important;
+
 }
 
 
@@ -171,6 +185,78 @@
 }
 
 
+.navbar {
+
+  width: 100%;
+  
+  color: #fff;
+
+  border: none;
+  
+  background: #00b388 !important;
+  
+  font-size: 20px;
+
+}
+
+
+.navbar-brand {
+
+  font-family: 'HP Simplified';
+
+  letter-spacing: 1px;
+
+  font-weight: bold;
+
+}
+
+
+.btn-link {
+
+  color: #fff !important;
+
+}
+
+
+.asset {
+
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+
+  border-bottom-left-radius: 4px !important;
+
+  border-bottom-right-radius: 4px !important;
+
+}
+
+
+.info {
+
+  font-family: 'HP Simplified' !important;
+
+  background: #00b388 !important;
+
+  border-top-left-radius: 4px !important;
+  
+  border-top-right-radius: 4px !important;
+  
+  font-family: Proxima;
+  
+  font-size: 15px;
+  
+  letter-spacing: 3px;
+  
+  color: #fff;
+  
+  padding: 15px;
+
+}
+
+
+
+
+
+
+
 
 
 
@@ -221,13 +307,6 @@
   height: 100% !important;
   
   /*border: 1px solid blue;*/
-
-}
-
-
-.asset {
-  
-  border: 3px solid green !important;
 
 }
 
