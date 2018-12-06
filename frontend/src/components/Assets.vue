@@ -143,8 +143,27 @@
 				</b-row>
 
 				<!-- HISTORY POPOVER -->
-				<b-popover v-bind:target="'popover_' + item.serialNumberInserv" triggers="click" placement="auto" title="History">
-					History shown here
+				<b-popover v-bind:target="'popover_' + item.serialNumberInserv" triggers="click" placement="auto" @show="onHistoryShow(item.serialNumberInserv)">
+
+					<template slot="title">
+						History
+				        <b-btn @click="onHistoryClose(item.serialNumberInserv)" class="close" aria-label="Close">
+				          <span class="d-inline-block" aria-hidden="true">&times;</span>
+				        </b-btn>
+				    </template>
+
+				    <b-row v-show="showHistorySpinner">
+				    	<b-col>
+				    		<div align-self="center" class="history_loader" id="spinner"></div>
+				    	</b-col>
+				    </b-row>
+					<b-row v-for="(hist, history_index) in history_items">
+						<b-col>
+							<!--<b-alert show variant="dark"> {{ hist.updated }} </b-alert>-->
+							<b-button v-if="items[index].date != history_items[history_index].date" variant="outline-secondary" class="mb-1" @click="doHistory(index, history_index, item.serialNumberInserv)">{{ hist.date }}</b-button>
+							<span v-if="history_items.length == 1"><b>There is no history for this machine</b></span>	
+						</b-col>
+					</b-row>
 				</b-popover>
 
 			</b-col>
@@ -198,12 +217,12 @@
 	<!------------------------------>
 	<!-- BEGIN PAGINATION NAV BAR -->
 	<!------------------------------>
-	<b-navbar variant="dark" type="dark">	
+	<b-navbar variant="dark" type="dark" v-show="!showSpinner">	
 		<!-- SPACER LEFT -->
 		<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
 			
-		<!-- PAGINATION COMPONENT -->
-		<b-pagination size="lg" :total-rows="numSystems" v-model="currentPage" :per-page="20"></b-pagination>
+			<!-- PAGINATION COMPONENT -->
+			<b-pagination size="lg" :total-rows="numSystems" v-model="currentPage" :per-page="20"></b-pagination>
 
     	<!-- SPACER RIGHT -->
   		<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
@@ -233,6 +252,7 @@ export default {
   data() {
   	return {
 	  	items: [],
+	  	history_items: [],
 	  	machine: '',
 	  	machine_index: 0,
 	  	currentPage: 1,
@@ -245,7 +265,9 @@ export default {
 	  	searchInput: '',
 	  	searchForm:'',
 	  	isSearch:false,
-	  	showSpinner: true
+	  	showSpinner: true,
+	  	showHistorySpinner: true,
+	  	popoverShow: false
 	}
   },
 
@@ -328,6 +350,36 @@ export default {
   methods: {
   	show_spin() {
     	this.showSpinner = true;
+    },
+    onHistoryClose(id) {
+      this.$root.$emit('bv::hide::popover', 'popover_' + id);
+      //console.log('popover_'+id)
+    },
+    onHistoryShow(id) {
+      /* This is called just before the popover is shown */
+      /* Reset our popover "form" variables */
+      this.history_items = [];
+      this.showHistorySpinner = true;
+      var username = this.$session.getAll().username
+  	  var password = this.$session.getAll().password
+      const path = 'http://localhost:5000/history?'
+	  const data = "username="+username+"&password="+password+"&sni="+id
+
+	  this.$http.post(path+data).then(response => {
+
+ 			var body = response.body;
+  			this.history_items = body
+  			this.showHistorySpinner = false;
+
+  		}).catch(error => {
+  			console.log(this.$session.getAll())
+  		})
+
+    },
+    doHistory(item_index, history_index, id) {
+    	this.items[item_index] = this.history_items[history_index];
+    	this.onHistoryClose(id);
+    	this.$forceUpdate();
     },
   	onSearch(){
   	    this.isSearch = true;
