@@ -135,7 +135,7 @@
 				
 				<!-- MORE INFORMATION BUTTON -->
 				<b-row>
-					<b-col class="text-center mb-1">
+					<b-col class="text-center mb-1 mt-1">
 						<b-button v-b-modal="'myModal'" @click="sendInfo(item, index)">
 							View more information
 						</b-button>
@@ -353,12 +353,22 @@ export default {
     },
     onHistoryClose(id) {
       this.$root.$emit('bv::hide::popover', 'popover_' + id);
-      //console.log('popover_'+id)
+    },
+    onHistoryDisable(id) {
+    	this.$root.$emit('bv::disable::popover', 'popover_' + id);
     },
     onHistoryShow(id) {
       /* This is called just before the popover is shown */
       /* Reset our popover "form" variables */
       this.history_items = [];
+      for(var i =0; i < this.items.length; i++)
+      {
+      	if(this.items[i].serialNumberInserv != id)
+      	{
+      		this.onHistoryClose(this.items[i].serialNumberInserv);
+      		this.onHistoryDisable(this.items[i].serialNumberInserv);
+      	}
+      }
       this.showHistorySpinner = true;
       var username = this.$session.getAll().username
   	  var password = this.$session.getAll().password
@@ -368,8 +378,9 @@ export default {
 	  this.$http.post(path+data).then(response => {
 
  			var body = response.body;
-  			this.history_items = body
+  			this.history_items = body;
   			this.showHistorySpinner = false;
+  			this.$root.$emit('bv::enable::popover'); //enables all popovers after query
 
   		}).catch(error => {
   			console.log(this.$session.getAll())
@@ -415,6 +426,7 @@ export default {
   	sendInfo(machine, machine_index) {
         this.machine = machine;
         this.machine_index = machine_index;
+        this.onHistoryClose(machine.serialNumberInserv)
     },
     general_json(item) {
     	return {"serialNumberInserv": item.serialNumberInserv, "updated": item.updated, "date": item.date}
