@@ -174,31 +174,31 @@
 			<b-container fluid>
 				<b-tabs>
 					<b-tab title="General" active>
-						<br><tree-view :data="general_json(machine)"></tree-view>
+						<br><tree-view :data="general_json(machine)" :options="{rootObjectKey: 'General'}">></tree-view>
 					</b-tab>
 
 				  	<b-tab title="System">
-				  		<br><tree-view :data="machine.system"></tree-view>
+				  		<br><tree-view :data="machine.system" :options="{rootObjectKey: 'System'}">></tree-view>
 				  	</b-tab>
 
 				  	<b-tab title="Capacity">
-				    	<br><tree-view :data="machine.capacity"></tree-view>
+				    	<br><tree-view :data="machine.capacity" :options="{rootObjectKey: 'Capacity'}">></tree-view>
 				  	</b-tab>
 
 				  	<b-tab title="Performance">
-				    	<br><tree-view :data="machine.performance"></tree-view>
+				    	<br><tree-view :data="machine.performance" :options="{rootObjectKey: 'Performance'}">></tree-view>
 				  	</b-tab>
 
 				  	<b-tab title="Disks">
-				    	<br><tree-view :data="machine.disks"></tree-view>
+				    	<br><tree-view :data="machine.disks" :options="{rootObjectKey: 'Disks'}">></tree-view>
 				  	</b-tab>
 
 				  	<b-tab title="Nodes">
-				    	<br><tree-view :data="machine.nodes"></tree-view>
+				    	<br><tree-view :data="machine.nodes" :options="{rootObjectKey: 'Nodes'}">></tree-view>
 				  	</b-tab>
 
 				  	<b-tab title="Authorized">
-				  		<br><tree-view :data="machine.authorized"></tree-view>
+				  		<br><tree-view :data="machine.authorized" :options="{rootObjectKey: 'Authorized'}">></tree-view>
 				  	</b-tab>
 				</b-tabs>
 			</b-container>
