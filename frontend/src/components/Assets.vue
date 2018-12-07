@@ -73,7 +73,7 @@
 
 					<!-- ASSET TITLE -->
 					<b-col class="text-center">
-						<b>{{item.system.companyName}}</b>	
+						<b>{{item.system.companyName}}</b>
 					</b-col>
 
 					<!-- CAPACITY WARNING -->
@@ -143,7 +143,7 @@
 				</b-row>
 
 				<!-- HISTORY POPOVER -->
-				<b-popover v-bind:target="'popover_' + item.serialNumberInserv" triggers="click" placement="auto" @show="onHistoryShow(item.serialNumberInserv)">
+				<b-popover v-bind:target="'popover_' + item.serialNumberInserv" triggers="click blur" placement="auto" @show="onHistoryShow(item.serialNumberInserv)">
 
 					<template slot="title">
 						History
