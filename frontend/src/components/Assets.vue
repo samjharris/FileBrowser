@@ -73,7 +73,8 @@
 
 					<!-- ASSET TITLE -->
 					<b-col class="text-center">
-						<b>{{item.system.companyName}}</b>
+						<b v-if="!item.system.companyName">Unknown</b>
+						<b v-else>{{item.system.companyName}}</b>
 					</b-col>
 
 					<!-- CAPACITY WARNING -->
@@ -136,7 +137,7 @@
 				<!-- MORE INFORMATION BUTTON -->
 				<b-row>
 					<b-col class="text-center mb-1 mt-1">
-						<b-button v-b-modal="'myModal'" @click="sendInfo(item, index)">
+						<b-button v-b-modal="'myModal'" @click="sendInfo(item, index, item.system.companyName)">
 							View more information
 						</b-button>
 					</b-col>
@@ -154,12 +155,11 @@
 
 				    <b-row v-show="showHistorySpinner">
 				    	<b-col>
-				    		<div align-self="center" class="history_loader" id="spinner"></div>
+				    		<div align-self="center" class="history_loader" id="history_spinner"></div>
 				    	</b-col>
 				    </b-row>
 					<b-row v-for="(hist, history_index) in history_items">
 						<b-col>
-							<!--<b-alert show variant="dark"> {{ hist.updated }} </b-alert>-->
 							<b-button v-if="items[index].date != history_items[history_index].date" variant="outline-secondary" class="mb-1" @click="doHistory(index, history_index, item.serialNumberInserv)">{{ hist.date }}</b-button>
 							<span v-if="history_items.length == 1"><b>There is no history for this machine</b></span>	
 						</b-col>
@@ -170,7 +170,7 @@
 		</b-row>
 	
 		<!-- MORE INFORMATION MODAL -->
-		<b-modal id="myModal" hide-footer v-bind:title="'Asset ' + (machine_index+1)">
+		<b-modal id="myModal" hide-footer v-bind:title="machine_name">
 			<b-container fluid>
 				<b-tabs>
 					<b-tab title="General" active>
@@ -244,17 +244,14 @@
 
 export default {
   name: 'Assets',
-  filters: {
-  	pretty: function(value) {
-      return JSON.stringify(value, null, 2);
-    }
-  },
   data() {
   	return {
+  		domain: 'localhost',
 	  	items: [],
 	  	history_items: [],
 	  	machine: '',
 	  	machine_index: 0,
+	  	machine_name: '',
 	  	currentPage: 1,
 	  	lastPage: 1,
 	  	emptyBodyText: "",
@@ -270,18 +267,10 @@ export default {
 	  	popoverShow: false
 	}
   },
-
-
-//FOR HISTORY:
-//const path = 'http://localhost:5000/history?'
-//const data = "username="+username+"&password="+password+"&sni="+serialNumberInserv_to_get_history_for
-
-
   created: function() {
   	if (!this.$session.exists()) {
   		this.$router.push('/')
-  	}
-  	else {
+  	} else {
   		var username = this.$session.getAll().username
   		var password = this.$session.getAll().password
   		var page = this.$session.getAll().page
@@ -289,10 +278,8 @@ export default {
   		this.currentPage = parseInt(page)
   		this.setSort(sort)
   		this.lastSortByCode = sort
-  		//const path = 'http://aws.kylesilverman.com:5000/machines?'
-  		const path = 'http://localhost:5000/machines?'
+  		const path = 'http://'+this.domain+':5000/machines?'
   		const data = "username="+username+"&password="+password+"&page="+page+"&sort="+sort
-  		
   		
   		this.$http.post(path+data).then(response => {
 
@@ -307,26 +294,22 @@ export default {
   	}
   },
   updated: function() {
-  	if(this.currentPage != this.lastPage || this.sortByCode != this.lastSortByCode){
+  	if(this.currentPage != this.lastPage || this.sortByCode != this.lastSortByCode) {
   		
   		this.showSpinner = true;
-  		
-  		if(this.sortByCode != this.lastSortByCode){ this.currentPage = 1 }
-
+  		if(this.sortByCode != this.lastSortByCode) { 
+  			this.currentPage = 1 
+  		}
   		this.lastPage = this.currentPage
   		this.lastSortByCode = this.sortByCode
-
   		if (!this.$session.exists()) {
   			this.$router.push('/')
-  		}
-  		else {
+  		} else {
   			var username = this.$session.getAll().username
   			var password = this.$session.getAll().password
 
-  			//const path = 'http://aws.kylesilverman.com:5000/machines?'
-  			const path = 'http://localhost:5000/machines?'
+  			const path = 'http://'+this.domain+':5000/machines?'
   			const data = "username="+username+"&password="+password+"&page="+this.currentPage+"&sort="+this.sortByCode
-
   			this.$session.set('page', this.currentPage);
   			this.$session.set('sort', this.sortByCode);
 
@@ -335,15 +318,13 @@ export default {
  				var body = response.body
  				this.numSystems = body.numSystems;
   				this.items = body.machines;
-  				if(body.length === 0){
-  					this.emptyBodyText = "There are no more systems to display. Please navigate to a previous page."
-  				}else{
-  					this.emptyBodyText = ""
-  				}
+  				this.emptyBodyText = (body.length === 0) ? "There are no more systems to display. Please navigate to a previous page." : "";
   				this.showSpinner = false;
+
   			}).catch(error => {
   				console.log(this.$session.getAll())
   			})
+
   		}
   	}
   },
@@ -358,13 +339,9 @@ export default {
     	this.$root.$emit('bv::disable::popover', 'popover_' + id);
     },
     onHistoryShow(id) {
-      /* This is called just before the popover is shown */
-      /* Reset our popover "form" variables */
       this.history_items = [];
-      for(var i =0; i < this.items.length; i++)
-      {
-      	if(this.items[i].serialNumberInserv != id)
-      	{
+      for(var i =0; i < this.items.length; i++) {
+      	if(this.items[i].serialNumberInserv != id) {
       		this.onHistoryClose(this.items[i].serialNumberInserv);
       		this.onHistoryDisable(this.items[i].serialNumberInserv);
       	}
@@ -372,7 +349,7 @@ export default {
       this.showHistorySpinner = true;
       var username = this.$session.getAll().username
   	  var password = this.$session.getAll().password
-      const path = 'http://localhost:5000/history?'
+      const path = 'http://'+this.domain+':5000/history?'
 	  const data = "username="+username+"&password="+password+"&sni="+id
 
 	  this.$http.post(path+data).then(response => {
@@ -392,40 +369,39 @@ export default {
     	this.onHistoryClose(id);
     	this.$forceUpdate();
     },
-  	onSearch(){
+  	onSearch() {
   	    this.isSearch = true;
   		this.searchInput = this.searchForm;
   		this.searchForm = "";
-
   	},
-  	clearSearch(){
+  	clearSearch() {
   		this.isSearch = false;
   	},
-  	setSort(val){
-
-  		if(val === 'fslh'){
+  	setSort(val) {
+  		if(val === 'fslh') {
   			this.sortByIcon = ['fas', 'sort-amount-up']
   			this.sortByCode = 'fslh'
-  		}else if(val === 'fshl'){
+  		} else if(val === 'fshl') {
   			this.sortByIcon = ['fas', 'sort-amount-down']
   			this.sortByCode = 'fshl'
-  		}else if(val === 'snlh'){
+  		} else if(val === 'snlh') {
   			this.sortByIcon = ['fas', 'sort-numeric-down']
   			this.sortByCode = 'snlh'
-  		}else if(val === 'snhl'){
+  		} else if(val === 'snhl') {
   			this.sortByIcon = ['fas', 'sort-numeric-up']
   			this.sortByCode = 'snhl'
-  		}else if(val === 'cnaz'){
+  		} else if(val === 'cnaz') {
   			this.sortByIcon = ['fas', 'sort-alpha-down']
   			this.sortByCode = 'cnaz'
-  		}else if(val === 'cnza'){
+  		} else if(val === 'cnza') {
   			this.sortByIcon = ['fas', 'sort-alpha-up']
   			this.sortByCode = 'cnza'
   		}
   	},
-  	sendInfo(machine, machine_index) {
+  	sendInfo(machine, machine_index, machine_name) {
         this.machine = machine;
         this.machine_index = machine_index;
+        this.machine_name = machine.system.companyName ? machine_name : 'Unknown';
         this.onHistoryClose(machine.serialNumberInserv)
     },
     general_json(item) {
@@ -442,13 +418,8 @@ export default {
         return this.downloadFile(data, this.strip_time(file_name))
   	},
   	getVariantType: function(availableCapacity) {
-        if (availableCapacity <= 30) {
-						console.log("Danger")
-            return "danger"
-        }
-        else {
-            return "success"
-        }
+  		var result = (availableCapacity <= 30) ? "danger" : "success";
+        return result;
     },
     parseIntFreeCapacity: function(freePct){
 	     return Math.round(freePct);
@@ -457,20 +428,11 @@ export default {
 	     return freePct.toFixed(2); 
 	},
   	downloadFile(response, filename) {
-	  // It is necessary to create a new blob object with mime-type explicitly set
-	  // otherwise only Chrome works like it should
 	  var newBlob = new Blob([response], {type: 'application/json'})
-
-	  // IE doesn't allow using a blob object directly as link href
-	  // instead it is necessary to use msSaveOrOpenBlob
-	  if (window.navigator && window.navigator.msSaveOrOpenBlob) 
-	  {
+	  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
 	    window.navigator.msSaveOrOpenBlob(newBlob)
 	    return
 	  }
-
-	  // For other browsers:
-	  // Create a link pointing to the ObjectURL containing the blob.
 	  const data = window.URL.createObjectURL(newBlob)
 	  var link = document.createElement('a')
 	  link.href = data
@@ -478,18 +440,16 @@ export default {
 	  link.click()
 	  setTimeout(function () 
 	  {
-	    // For Firefox it is necessary to delay revoking the ObjectURL
 	    window.URL.revokeObjectURL(data)
 	  }, 100)
 	},
 	strip_time(str) {
-		for(var i=0; i < str.length; i++)
-		{
-			if(str[i] == "T")
-			{
+		for(var i=0; i < str.length; i++) {
+			if(str[i] == "T") {
 				return str.substring(0, i);
 			}
 		}
+		return str;
 	}
   } 
 }
