@@ -10,6 +10,7 @@
   		<!-- TITLE -->
   		<b-navbar-brand href="#">FileBrowser</b-navbar-brand>
   		<b-collapse is-nav id="nav_collapse">
+  			<b-navbar-brand href="#" class="ml-auto">Logged in: {{ getUsername() }}</b-navbar-brand>
 			<b-navbar-nav class="ml-auto">
 				
 				<!-- SORT ORDER DROPDOWN -->
@@ -450,6 +451,9 @@ export default {
 			}
 		}
 		return str;
+	},
+	getUsername() {
+		return this.$session.getAll().username;
 	}
   } 
 }
