@@ -10,7 +10,7 @@
   		<!-- TITLE -->
   		<b-navbar-brand href="#">FileBrowser</b-navbar-brand>
   		<b-collapse is-nav id="nav_collapse">
-  			<b-navbar-brand href="#" class="ml-auto">Logged in: {{ getUsername() }}</b-navbar-brand>
+  			<b-navbar-brand href="#" class="ml-auto">Logged in as: {{ getUsername() }}</b-navbar-brand>
 			<b-navbar-nav class="ml-auto">
 				
 				<!-- SORT ORDER DROPDOWN -->
@@ -261,6 +261,7 @@ export default {
 	  	lastSortByCode: 'fslh',
 	  	sortByIcon: ['fas', 'sort-amount-up'],
 	  	searchInput: '',
+	  	lastSearchInput: '',
 	  	searchForm:'',
 	  	isSearch:false,
 	  	showSpinner: true,
@@ -276,11 +277,18 @@ export default {
   		var password = this.$session.getAll().password
   		var page = this.$session.getAll().page
   		var sort = this.$session.getAll().sort
+  	    var search = this.$session.getAll().search
+  	    if(search === undefined) search = ''
   		this.currentPage = parseInt(page)
   		this.setSort(sort)
   		this.lastSortByCode = sort
+  		this.searchInput = search
+  		this.lastSearchInput = search
+  		if(search != ''){
+  			this.isSearch = true
+  		} 
   		const path = 'http://'+this.domain+':5000/machines?'
-  		const data = "username="+username+"&password="+password+"&page="+page+"&sort="+sort
+  		const data = "username="+username+"&password="+password+"&page="+page+"&sort="+sort+"&search="+search 
   		
   		this.$http.post(path+data).then(response => {
 
@@ -295,14 +303,16 @@ export default {
   	}
   },
   updated: function() {
-  	if(this.currentPage != this.lastPage || this.sortByCode != this.lastSortByCode) {
+  	if(this.currentPage != this.lastPage || this.sortByCode != this.lastSortByCode || this.searchInput != this.lastSearchInput) {
   		
   		this.showSpinner = true;
-  		if(this.sortByCode != this.lastSortByCode) { 
+  		if(this.sortByCode != this.lastSortByCode || this.searchInput != this.lastSearchInput) { 
   			this.currentPage = 1 
   		}
   		this.lastPage = this.currentPage
   		this.lastSortByCode = this.sortByCode
+  		this.lastSearchInput = this.searchInput
+
   		if (!this.$session.exists()) {
   			this.$router.push('/')
   		} else {
@@ -310,9 +320,11 @@ export default {
   			var password = this.$session.getAll().password
 
   			const path = 'http://'+this.domain+':5000/machines?'
-  			const data = "username="+username+"&password="+password+"&page="+this.currentPage+"&sort="+this.sortByCode
+  			const data = "username="+username+"&password="+password+"&page="+this.currentPage+"&sort="+this.sortByCode+"&search="+this.searchInput
   			this.$session.set('page', this.currentPage);
   			this.$session.set('sort', this.sortByCode);
+  			this.$session.set('search', this.searchInput);
+
 
   			this.$http.post(path+data).then(response => {
  
@@ -377,6 +389,8 @@ export default {
   	},
   	clearSearch() {
   		this.isSearch = false;
+  		this.searchInput = '';
+  		this.searchForm = '';
   	},
   	setSort(val) {
   		if(val === 'fslh') {

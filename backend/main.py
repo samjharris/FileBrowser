@@ -117,7 +117,7 @@ def machines():
     sortField = get_sort_field(sortCode)
     sortOrder = get_sort_order(sortCode)
 
-
+    search = request.args.get("search")
 
     if(authenticate_user(username, pswd)):
 
@@ -126,6 +126,24 @@ def machines():
                 {'username':username}
             )
         tenant = user['tenant']
+
+
+        #First, handle cases when we are searching:
+        if(search != ""):
+        	search_machines = mongo.db.dataLogs.find( {'authorized.tenants':tenant,   
+        											   '$or': [ {'serialNumberInserv': search},{'system.companyName': search} ],
+        											   'historyIndex':1},
+                						   			  {'_id':0, 'historyIndex':0}
+            							   ).sort(
+            							   	 sortField,sortOrder
+            							   ).skip( (pagenum - 1) * SYS_PER_PAGE ).limit( SYS_PER_PAGE )
+
+        	search_numSystems = int(search_machines.count())
+
+        	search_datadump = {'numSystems':search_numSystems,'machines':search_machines}
+        	return dumps(search_datadump), 200
+        
+
 
         #Get all files associated with <tenant> 
 		#only files with historyIndex=1 (most recent)
