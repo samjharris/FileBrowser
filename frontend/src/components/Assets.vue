@@ -303,6 +303,9 @@ export default {
   	}
   },
   updated: function() {
+  	if(this.searchForm !== undefined || this.searchForm !== ''){
+  			this.$session.set('search', this.searchForm);
+  	}
   	if(this.currentPage != this.lastPage || this.sortByCode != this.lastSortByCode || this.searchInput != this.lastSearchInput) {
   		
   		this.showSpinner = true;
