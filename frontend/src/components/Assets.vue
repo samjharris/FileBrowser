@@ -247,7 +247,7 @@ export default {
   name: 'Assets',
   data() {
   	return {
-  		domain: 'localhost',
+  		domain: 'aws.kylesilverman.com',
 	  	items: [],
 	  	history_items: [],
 	  	machine: '',
