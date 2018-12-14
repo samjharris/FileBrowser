@@ -73,6 +73,11 @@
 
     },
 
+    created: function() {
+      if (this.$session.exists()) {
+        this.$session.destroy()
+      } 
+    },
 
     methods: {
 

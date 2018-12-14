@@ -248,6 +248,7 @@ export default {
   data() {
   	return {
   		domain: 'aws.kylesilverman.com',
+  		//domain: 'localhost',
 	  	items: [],
 	  	history_items: [],
 	  	machine: '',
