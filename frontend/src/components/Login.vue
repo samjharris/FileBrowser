@@ -104,7 +104,7 @@
 
           })
 
-          .catch(err => {});
+          .catch(err => {console.log("login error"); window.alert("Invalid username or password");});
     
       }
     
