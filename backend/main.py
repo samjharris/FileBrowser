@@ -131,12 +131,18 @@ def machines():
         #First, handle cases when we are searching:
         if(search != ""):
         	search_machines = mongo.db.dataLogs.find( {'authorized.tenants':tenant,   
-        											   '$or': [ {'serialNumberInserv': search},{'system.companyName': search} ],
+        											   '$or': [ {'serialNumberInserv': 
+        											   				{'$regex': ('.*'+search+'.*'),'$options':'si'}}, 
+        											   			{'system.companyName': 
+        											   				{'$regex': ('.*'+search+'.*'),'$options':'si'}} ],
         											   'historyIndex':1},
                 						   			  {'_id':0, 'historyIndex':0}
             							   ).sort(
             							   	 sortField,sortOrder
             							   ).skip( (pagenum - 1) * SYS_PER_PAGE ).limit( SYS_PER_PAGE )
+
+            #if no exact matches, try longer search:
+
 
         	search_numSystems = int(search_machines.count())
 

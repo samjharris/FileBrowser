@@ -161,3 +161,4 @@ for cur_properLog in json_dicts:
         # find the matching entry by unique _id field we have stored, 
         # then update the db with the other info we have stored
         dataLogs_collection.find_one_and_update({'_id' : curElem['id']},{'$set': {'historyIndex' : curElem['hist']}})
+

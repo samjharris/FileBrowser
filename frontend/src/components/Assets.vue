@@ -114,7 +114,7 @@
 				<!-- LAST UPDATE -->
 				<b-row>
 					<b-col class="">
-						<b>Last Updated:</b> {{ item.updated }}
+						<b>Last Updated:</b> {{prettyTime(item.updated)}}
 					</b-col>
 				</b-row>
 
@@ -346,6 +346,11 @@ export default {
   	}
   },
   methods: {
+  	prettyTime(db_format){
+  		var date = new Date(db_format);
+  		var date_str = date.toDateString();
+  		return date_str.substring(date_str.indexOf(' ')+1);
+  	},
   	show_spin() {
     	this.showSpinner = true;
     },

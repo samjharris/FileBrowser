@@ -84,6 +84,7 @@
       onSubmit(event) {
 
         const base = 'http://aws.kylesilverman.com:5000/login';
+        //const base = 'http://localhost:5000/login';
 
         const endpoint = base + '?' + queryString.stringify(this.form);
 
