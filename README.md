@@ -1,8 +1,7 @@
 # FileBrowser
 CS 320, Team 2 Project Repository
 
-
-##Project details
+## Project details
 
 FileBrowser is an intuitive, user-friendly service that provides support experts the tools 
 they need to make their customers’ lives simpler. This service was designed for integration 
@@ -12,20 +11,23 @@ and would allow support users the ability to query for and download particular f
 Full project description available [here](/Project_Charter_PDF.pdf).
 
 
-##Demo
-Demonstration video available [here](.).
+## Demo
+Demonstration video available [here](/deadlink).
 
 
-##Wiki
-A small wiki about this project is available [here](https://github.com/samjharris/FileBrowser/wiki).
+## Wiki
+A small wiki about this project is available [here](/wiki).
 
-##Credits
+## Credits
 Developed by Team 2, a/k/a <i>"JSON_derulo"</i>.
 
+#### Team Manager:</b>
 <pre>
-<b>Team Manager:</b>
 Tyler Schoppe
-<b>Team Members:</b>
+</pre>
+
+#### Team Members:
+<pre>
 Kyle Silverman
 Akhil Raheja
 Maxwell Paul
@@ -39,9 +41,9 @@ Malik Brahimi
 
 This project was a collaborative effort by Hewlett Packard Enterprise in partnership with the University of Massachusetts Amherst. 
 
-##Other useful information
+## Other useful information
 
-###Tech Stack
+### Tech Stack
 <pre>
                     <b>version</b>
   Vue.js            3.1.1
@@ -50,7 +52,7 @@ This project was a collaborative effort by Hewlett Packard Enterprise in partner
   MongoDB           4.0.2
 </pre>  
   
-###Dummy Users
+### Dummy Users
 <pre>
   <b>usernames:</b>     <b>passwords:</b>
   kyle            password
