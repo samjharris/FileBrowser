@@ -2,6 +2,15 @@
 
   <div class="login">
 
+    <b-alert variant="danger" dismissible
+      
+      :show="error" @dismissed="error=false">
+
+      Invalid username or password
+
+    </b-alert>
+
+
     <b-form class="login" @submit.prevent="onSubmit">
       
       <!-- Username Field -->
@@ -60,6 +69,8 @@
     data() {
 
       return {
+
+        error: false,
       
         form: {
       
@@ -105,7 +116,7 @@
 
           })
 
-          .catch(err => {console.log("login error"); window.alert("Invalid username or password");});
+          .catch(err => { this.error = true; });
     
       }
     

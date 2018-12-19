@@ -28,6 +28,10 @@
 
   background: #fff;
 
+  padding-top: 2px;
+
+  padding-bottom: 2px;
+
 }
 
 
@@ -35,7 +39,13 @@
 
   background: #efefef !important;
 
+  padding-top: 25px;
+
+  padding-bottom: 25px;
+
 }
+
+
 
 
 .login {
@@ -220,6 +230,8 @@
 
 .asset {
 
+  background: white !important;
+
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
 
   border-bottom-left-radius: 4px !important;
@@ -231,7 +243,11 @@
 
 .info {
 
-  font-family: 'HP Simplified' !important;
+  font-weight: normal !important;
+
+  margin-bottom: 10px;
+
+  font-family: 'Avenir', Helvetica, Arial, sans-serif !important;
 
   background: #00b388 !important;
 
@@ -239,24 +255,44 @@
   
   border-top-right-radius: 4px !important;
   
-  font-family: Proxima;
-  
   font-size: 15px;
   
-  letter-spacing: 3px;
+  letter-spacing: 1px;
   
   color: #fff;
   
-  padding: 15px;
+  padding: 15px !important;
 
 }
 
+body {
+  background: #efefef !important;
+}
 
+.view {
+  font-weight: bold;
+  color: black !important;
+  font-family: 'HP Simplified' !important;
+}
 
+.b-pagination {
+  margin: 0 auto !important;
+}
 
+.pagediv{
+  padding-bottom:25px;
+  background-color: #efefef;
+  text-align: center !important;
+}
 
-
-
+.footer{
+  background: #00b388;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  font-family: 'HP Simplified' !important;
+  color: white;
+  letter-spacing: 1px;
+}
 
 .history_row {
   border: 1px solid blue;

@@ -8,9 +8,9 @@
   		<b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
   		
   		<!-- TITLE -->
-  		<b-navbar-brand href="#">FileBrowser</b-navbar-brand>
+  		<b-navbar-brand href="#">{{ getUsername() }}'s FileBrowser</b-navbar-brand>
   		<b-collapse is-nav id="nav_collapse">
-  			<b-navbar-brand href="#" class="ml-auto">Logged in as: {{ getUsername() }}</b-navbar-brand>
+
 			<b-navbar-nav class="ml-auto">
 				
 				<!-- SORT ORDER DROPDOWN -->
@@ -19,25 +19,29 @@
     					<span class="sr-only">Filter</span>
     				</template>
     					<b-dropdown-item v-on:click="setSort('fslh')">Free space: Low to High</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
     					<b-dropdown-item v-on:click="setSort('fshl')">Free space: High to Low</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
     					<b-dropdown-item v-on:click="setSort('snlh')">Serial number: Low to High</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
     					<b-dropdown-item v-on:click="setSort('snhl')">Serial number: High to Low</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
     					<b-dropdown-item v-on:click="setSort('cnaz')">Company name: A to Z</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
     					<b-dropdown-item v-on:click="setSort('cnza')">Company name: Z to A</b-dropdown-item>
   				</b-dropdown>
 
   				<!-- SEARCH FORM/BUTTON -->
       			<b-nav-form>
         			<b-form-input size="md" class="mr-md-2" type="text" v-model="searchForm" placeholder="serial # or company name"/></b-form-input>
-        			<b-button size="md" class="my-2 my-md-0" type="button" v-on:click="onSearch">Search</b-button>
+        			<b-button size="md" class="my-2 my-md-0" type="button" variant="link" v-on:click="onSearch">Search</b-button>
       			</b-nav-form>
 
       	        <!-- LOGOUT BUTTON -->
-      			<b-navbar-brand tag="h3" class="mb-0 px-2"> 
-					<b-form @submit="onLogout">
-						<b-button type="submit">Logout</b-button>
-					</b-form>
-				</b-navbar-brand>
+
+					<b-nav-form @submit="onLogout">
+						<b-button variant="link" type="submit">Logout</b-button>
+					</b-nav-form>
 
       		</b-navbar-nav>
   		</b-collapse>
@@ -138,7 +142,7 @@
 				<!-- MORE INFORMATION BUTTON -->
 				<b-row>
 					<b-col class="text-center mb-1 mt-1">
-						<b-button v-b-modal="'myModal'" @click="sendInfo(item, index, item.system.companyName)">
+						<b-button class="view" variant="link" v-b-modal="'myModal'" @click="sendInfo(item, index, item.system.companyName)">
 							View more information
 						</b-button>
 					</b-col>
@@ -218,25 +222,19 @@
 	<!------------------------------>
 	<!-- BEGIN PAGINATION NAV BAR -->
 	<!------------------------------>
-	<b-navbar variant="dark" type="dark" v-show="!showSpinner">	
-		<!-- SPACER LEFT -->
-		<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
-			
-			<!-- PAGINATION COMPONENT -->
-			<b-pagination size="lg" :total-rows="numSystems" v-model="currentPage" :per-page="20"></b-pagination>
+	<div class="pagediv" variant="dark" type="dark" v-show="!showSpinner">	
 
-    	<!-- SPACER RIGHT -->
-  		<b-navbar-brand tag="h1" class="mb-0"></b-navbar-brand>
-	</b-navbar>
+			<!-- PAGINATION COMPONENT -->
+			<b-pagination align="center" size="lg" :total-rows="numSystems" v-model="currentPage" :per-page="20"></b-pagination>
+
+	</div>
 		
 	<!------------------>
 	<!-- BEGIN FOOTER -->
 	<!------------------>
-	<b-row align-v="end" class="mt-4 mb-4">
-		<b-col class="text-center">
-			© 2018 Copyright: FileBrowser developed for HPE by JSON_Derulo, University of Massachusetts
-		</b-col>
-	</b-row>
+	<div align-v="end" class="footer text-center" v-show="!showSpinner">
+		<span>© 2018 Copyright: FileBrowser developed for HPE by JSON_Derulo, University of Massachusetts</span>
+	</div>
 
 </div>
 </template>
