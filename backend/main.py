@@ -55,6 +55,9 @@ MONGO_URI = MONGO_URI.format(
 
 )
 
+# paging variables
+
+SYS_PER_PAGE = 20
 
 # init the connection to mongo
 mongo = PyMongo(app, MONGO_URI)
@@ -107,23 +110,67 @@ def machines():
 
     pswd = request.args.get("password")
 
+    pagenum = int(request.args.get("page"))
+
+    sortCode = request.args.get("sort")
+
+    sortField = get_sort_field(sortCode)
+    sortOrder = get_sort_order(sortCode)
+
+    search = request.args.get("search")
+
     if(authenticate_user(username, pswd)):
+
+    	#Get tenant associated with username
 
         user = mongo.db.users.find_one(
                 {'username':username}
             )
-
         tenant = user['tenant']
         
 
-        machines = mongo.db.dataLogs.find(
-                {'authorized.tenants':tenant, 'historyIndex':1},
-                {'_id':0, 'historyIndex':0}
-            )
+
+        #First, handle cases when we are searching:
+        if(search != ""):
+        	search_machines = mongo.db.dataLogs.find( {'authorized.tenants':tenant,   
+        											   '$or': [ {'serialNumberInserv': 
+        											   				{'$regex': ('.*'+search+'.*'),'$options':'si'}}, 
+        											   			{'system.companyName': 
+        											   				{'$regex': ('.*'+search+'.*'),'$options':'si'}} ],
+        											   'historyIndex':1},
+                						   			  {'_id':0, 'historyIndex':0}
+            							   ).sort(
+            							   	 sortField,sortOrder
+            							   ).skip( (pagenum - 1) * SYS_PER_PAGE ).limit( SYS_PER_PAGE )
+
+           
+
+
+        	search_numSystems = int(search_machines.count())
+
+        	search_datadump = {'numSystems':search_numSystems,'machines':search_machines}
+        	return dumps(search_datadump), 200
+        
+
+
+        #Get all files associated with <tenant> 
+		#only files with historyIndex=1 (most recent)
+		#strips fields '_id' and 'historyIndex'
+		#skips to pagenum
+		#limits to SYS_PER_PAGE
+        machines = mongo.db.dataLogs.find( {'authorized.tenants':tenant, 'historyIndex':1},
+                						   {'_id':0, 'historyIndex':0}
+            							   ).sort(
+            							   	 sortField,sortOrder
+            							   ).skip( (pagenum - 1) * SYS_PER_PAGE ).limit( SYS_PER_PAGE )
+
+        numSystems = int(machines.count())
+
+        datadump = {'numSystems':numSystems,'machines':machines}
 
         # return data with success
         
-        return dumps(machines), 200
+        return dumps(datadump), 200
 
 
     # unauthorized user
@@ -132,45 +179,38 @@ def machines():
 
 
 ################################################################################
-# Get List of Logs #############################################################
+# Get History #############################################################
 ################################################################################
-"""
-@app.route("/machines/<ssn>/logs", methods = ["POST"])
 
-def logs():
+@app.route("/history", methods = ["POST"])
 
-    if "tenant" in session:
+def history():
+	username = request.args.get("username")
+	pswd = request.args.get("password")
+	serialnumber = request.args.get("sni")
 
-        # attempt to find the machine specified by params
+	if(authenticate_user(username, pswd)):
+		user = mongo.db.users.find_one({'username':username})
+		tenant = user['tenant']
 
-        machine = mongo.db.machines.find_one({"ssn": ssn})
+		#Get all files associated with <serialnumber> 
+		#in ascending numerical order w/ respect to historyIndex.
+		#strips fields '_id' and 'historyIndex'
+		#limits to 10 most recent
+		histories = mongo.db.dataLogs.find( {'serialNumberInserv':serialnumber, 'authorized.tenants':tenant},
+											{'_id':0, 'historyIndex':0}
+											).sort('historyIndex').limit(10)
 
-
-        if machine is not None:
-
-            logs = mongo.db.logs({
-
-                # get objects from logs prop
-
-                "_id": {"$in": machine.logs}
-
-            }) 
-
-
-            # return machine's logs
-
-            return dumps(logs), 200
+		#return data with success
+		return dumps(histories), 200
 
 
-        # ssn non-existant
+	# unauthorized user
+	return STATUS_401
 
-        return STATUS_200
+        
 
 
-    # unauthorized user
-    
-    return STATUS_401
-"""
 ################################################################################
 # Run App ######################################################################
 ################################################################################
@@ -206,3 +246,35 @@ def authenticate_user(username, pswd):
     # unauthorized user
     
     return False
+
+def get_sort_field(code):
+	if code == 'fslh':
+		return 'capacity.total.freePct'
+	elif code == 'fshl':
+		return 'capacity.total.freePct'
+	elif code == 'snlh':
+		return 'serialNumberInserv'
+	elif code == 'snhl':
+		return 'serialNumberInserv'
+	elif code == 'cnaz':
+		return 'system.companyName'
+	elif code == 'cnza':
+		return 'system.companyName'
+	else:
+		return 'capacity.total.freePct'
+
+def get_sort_order(code):
+	if code == 'fslh':
+		return 1
+	elif code == 'fshl':
+		return -1
+	elif code == 'snlh':
+		return 1
+	elif code == 'snhl':
+		return -1
+	elif code == 'cnaz':
+		return 1
+	elif code == 'cnza':
+		return -1
+	else:
+		return 1

@@ -2,6 +2,15 @@
 
   <div class="login">
 
+    <b-alert variant="danger" dismissible
+      
+      :show="error" @dismissed="error=false">
+
+      Invalid username or password
+
+    </b-alert>
+
+
     <b-form class="login" @submit.prevent="onSubmit">
       
       <!-- Username Field -->
@@ -60,6 +69,8 @@
     data() {
 
       return {
+
+        error: false,
       
         form: {
       
@@ -73,12 +84,18 @@
 
     },
 
+    created: function() {
+      if (this.$session.exists()) {
+        this.$session.destroy()
+      } 
+    },
 
     methods: {
 
       onSubmit(event) {
 
         const base = 'http://aws.kylesilverman.com:5000/login';
+        //const base = 'http://localhost:5000/login';
 
         const endpoint = base + '?' + queryString.stringify(this.form);
 
@@ -92,12 +109,14 @@
             this.$session.set('username', this.form.username);
             
             this.$session.set('password', this.form.password);
+
+            this.$session.set('page', 1);
             
             this.$router.push({ name: 'Assets' });
 
           })
 
-          .catch(err => {});
+          .catch(err => { this.error = true; });
     
       }
     

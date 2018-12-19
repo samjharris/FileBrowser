@@ -24,7 +24,29 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { faHdd } from '@fortawesome/free-regular-svg-icons';
 
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons';
 
+import { faSortAmountDown } from '@fortawesome/free-solid-svg-icons';
+
+import { faSortAmountUp } from '@fortawesome/free-solid-svg-icons';
+
+import { faSortNumericDown } from '@fortawesome/free-solid-svg-icons';
+
+import { faSortNumericUp } from '@fortawesome/free-solid-svg-icons';
+
+import { faSortAlphaDown } from '@fortawesome/free-solid-svg-icons';
+
+import { faSortAlphaUp } from '@fortawesome/free-solid-svg-icons';
+
+import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faFileDownload, faHdd, faExclamationTriangle, faSortAmountDown, faSortAmountUp, faSortNumericDown, faSortNumericUp, faSortAlphaDown, faSortAlphaUp, faTimesCircle);
+
+import VueChartkick from 'vue-chartkick'
+
+import Chart from 'chart.js'
+
+Vue.use(VueChartkick, {adapter: Chart})
 
 library.add(faFileDownload, faHdd);
 

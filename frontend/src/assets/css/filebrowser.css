@@ -1,6 +1,6 @@
 @font-face {
 
-  font-family: "HP Simplified";
+  font-family: 'HP Simplified';
 
   font-style: normal;
 
@@ -13,7 +13,7 @@
 
 @font-face {
 
-  font-family: "HP Simplified";
+  font-family: 'HP Simplified';
 
   font-style: normal;
 
@@ -22,6 +22,30 @@
   src: url('../fonts/HP Simplified/HPSimplified_Rg.ttf');
   
 }
+
+
+.asset .row {
+
+  background: #fff;
+
+  padding-top: 2px;
+
+  padding-bottom: 2px;
+
+}
+
+
+.asset-parent {
+
+  background: #efefef !important;
+
+  padding-top: 25px;
+
+  padding-bottom: 25px;
+
+}
+
+
 
 
 .login {
@@ -134,6 +158,8 @@
 
 .igroup {
 
+  background: white;
+  
   cursor: pointer;
 
   z-index: 1;
@@ -171,8 +197,108 @@
 }
 
 
+.navbar {
+
+  width: 100%;
+  
+  color: #fff;
+
+  border: none;
+  
+  background: #00b388 !important;
+  
+  font-size: 20px;
+
+}
 
 
+.navbar-brand {
+
+  font-family: 'HP Simplified';
+
+  letter-spacing: 1px;
+
+  font-weight: bold;
+
+}
+
+
+.btn-link {
+
+  color: #fff !important;
+
+}
+
+
+.asset {
+
+  background: white !important;
+
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+
+  border-bottom-left-radius: 4px !important;
+
+  border-bottom-right-radius: 4px !important;
+
+}
+
+
+.info {
+
+  font-weight: normal !important;
+
+  margin-bottom: 10px;
+
+  font-family: 'Avenir', Helvetica, Arial, sans-serif !important;
+
+  background: #00b388 !important;
+
+  border-top-left-radius: 4px !important;
+  
+  border-top-right-radius: 4px !important;
+  
+  font-size: 15px;
+  
+  letter-spacing: 1px;
+  
+  color: #fff;
+  
+  padding: 15px !important;
+
+}
+
+body {
+  background: #efefef !important;
+}
+
+.view {
+  font-weight: bold;
+  color: black !important;
+  font-family: 'HP Simplified' !important;
+}
+
+.b-pagination {
+  margin: 0 auto !important;
+}
+
+.pagediv{
+  padding-bottom:25px;
+  background-color: #efefef;
+  text-align: center !important;
+}
+
+.footer{
+  background: #00b388;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  font-family: 'HP Simplified' !important;
+  color: white;
+  letter-spacing: 1px;
+}
+
+.history_row {
+  border: 1px solid blue;
+}
 
 
 .modal {
@@ -225,13 +351,6 @@
 }
 
 
-.asset {
-  
-  border: 3px solid green !important;
-
-}
-
-
 .inner {
   
   border: 1px solid red !important;
@@ -272,9 +391,45 @@
 
 }
 
+.red_icon_hover{
+  color: red; 
+  cursor: pointer; 
+}
+
 
 .hover_mouse {
-  
   cursor: pointer;
+}
 
+.loader {
+  margin: auto;
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 1s linear infinite; /* Safari */
+  animation: spin 1s linear infinite;
+}
+
+.history_loader {
+  margin: auto;
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 60px;
+  height: 60px;
+  -webkit-animation: spin 1s linear infinite; /* Safari */
+  animation: spin 1s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
