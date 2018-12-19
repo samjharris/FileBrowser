@@ -37,6 +37,7 @@ Paul Mikulskis
 Yanjie Chen
 Nila Sadeeshkuma
 Malik Brahimi
+Qiaochu Kang
 </pre>
 
 This project was a collaborative effort by Hewlett Packard Enterprise in partnership with the University of Massachusetts Amherst. 
