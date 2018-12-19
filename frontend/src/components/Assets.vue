@@ -271,6 +271,7 @@ export default {
   created: function() {
   	if (!this.$session.exists()) {
   		this.$router.push('/')
+
   	} else {
   		var username = this.$session.getAll().username
   		var password = this.$session.getAll().password

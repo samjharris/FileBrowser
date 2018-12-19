@@ -122,10 +122,12 @@ def machines():
     if(authenticate_user(username, pswd)):
 
     	#Get tenant associated with username
+
         user = mongo.db.users.find_one(
                 {'username':username}
             )
         tenant = user['tenant']
+        
 
 
         #First, handle cases when we are searching:
@@ -141,7 +143,7 @@ def machines():
             							   	 sortField,sortOrder
             							   ).skip( (pagenum - 1) * SYS_PER_PAGE ).limit( SYS_PER_PAGE )
 
-            #if no exact matches, try longer search:
+           
 
 
         	search_numSystems = int(search_machines.count())
