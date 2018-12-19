@@ -16,7 +16,7 @@ Demonstration video available [here](/deadlink).
 
 
 ## Wiki
-A small wiki about this project is available [here](/wiki).
+A small wiki about this project is available [here](https://github.com/samjharris/FileBrowser/wiki).
 
 ## Credits
 Developed by Team 2, a/k/a <i>"JSON_derulo"</i>.
