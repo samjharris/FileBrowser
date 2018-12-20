@@ -156,10 +156,18 @@
 }
 
 
+.title {
+	margin-top: 40px;
+	font-family: 'HP Simplified';
+	text-align: center;
+	font-weight: bold;
+	letter-spacing: 1.5px;
+}
+
 .igroup {
 
   background: white;
-  
+
   cursor: pointer;
 
   z-index: 1;
